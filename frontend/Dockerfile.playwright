@@ -1,0 +1,21 @@
+# Usa la imagen oficial (ahorras 10-15 min de instalación en el build)
+FROM mcr.microsoft.com/playwright:v1.49.0-jammy
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias (incluyendo las de tu proyecto)
+RUN npm install
+
+# Copiar el resto del proyecto (incluyendo tus archivos de test)
+COPY . .
+
+# No hace falta "playwright install --with-deps" porque la imagen ya lo trae.
+# Pero si quieres asegurarte de tener la versión exacta de los navegadores:
+RUN npx playwright install chromium
+
+# Variable de entorno para Vite (si los tests la necesitan)
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
