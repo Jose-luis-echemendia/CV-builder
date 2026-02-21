@@ -27,8 +27,8 @@ RUN npm config set fetch-retry-maxtimeout 120000 && \
     npm config set fund false
 
 # Instalar dependencias con optimizaciones de red
-# Usar npm ci para reproducibilidad en testing
-RUN npm ci --prefer-online --no-audit --loglevel=error && \
+# Usar npm install para flexibilidad en testing (igual que Dockerfile.dev)
+RUN npm install --prefer-online --no-audit --loglevel=error && \
     npm cache clean --force
 
 # Verificar e instalar navegadores específicos para los tests
