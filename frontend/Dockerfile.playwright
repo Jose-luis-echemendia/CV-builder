@@ -1,21 +1,76 @@
-# Usa la imagen oficial (ahorras 10-15 min de instalación en el build)
+# =================================================================================
+#                 Dockerfile.playwright - Optimizado para E2E tests
+# =================================================================================
+# Usa la imagen oficial de Playwright con navegadores pre-instalados
 FROM mcr.microsoft.com/playwright:v1.49.0-jammy
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Instalar curl para health checks y debugging
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copiar archivos de configuración de npm primero
+COPY .npmrc* ./
+
+# Copiar archivos de dependencias para aprovechar el caché de Docker
 COPY package*.json ./
 
-# Instalar dependencias (incluyendo las de tu proyecto)
-RUN npm install
+# Configurar npm para mejor manejo de red y rendimiento
+RUN npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm config set maxsockets 5 && \
+    npm config set audit false && \
+    npm config set fund false
 
-# Copiar el resto del proyecto (incluyendo tus archivos de test)
+# Instalar dependencias con optimizaciones de red
+# Usar npm ci para reproducibilidad en testing
+RUN npm ci --prefer-online --no-audit --loglevel=error && \
+    npm cache clean --force
+
+# Verificar e instalar navegadores específicos para los tests
+# La imagen ya los trae, pero nos aseguramos de tener la versión correcta
+RUN npx playwright install --with-deps chromium firefox webkit || \
+    npx playwright install chromium
+
+# Copiar el resto del proyecto
 COPY . .
 
-# No hace falta "playwright install --with-deps" porque la imagen ya lo trae.
-# Pero si quieres asegurarte de tener la versión exacta de los navegadores:
-RUN npx playwright install chromium
+# Crear usuario no-root para ejecutar tests de forma segura
+RUN groupadd -r playwright -g 1001 && \
+    useradd -r -g playwright -u 1001 -d /app -s /bin/bash playwright && \
+    chown -R playwright:playwright /app /home
 
-# Variable de entorno para Vite (si los tests la necesitan)
+# Crear directorios para resultados de tests con permisos correctos
+RUN mkdir -p \
+    /app/test-results \
+    /app/playwright-report \
+    /app/playwright/.cache && \
+    chown -R playwright:playwright \
+    /app/test-results \
+    /app/playwright-report \
+    /app/playwright/.cache
+
+# Variables de entorno para optimizar Playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
+    NODE_ENV=test \
+    CI=true
+
+# Variable de entorno para Vite (configurable en runtime)
 ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
+# Cambiar a usuario no-root
+USER playwright
+
+# Health check para verificar que Playwright está listo
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=2 \
+    CMD npx playwright --version || exit 1
+
+# Comando por defecto: ejecutar tests
+# Se puede sobreescribir en docker-compose para otros comandos
+CMD ["npx", "playwright", "test"]

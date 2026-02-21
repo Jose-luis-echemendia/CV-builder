@@ -183,6 +183,17 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - S3_USE_SSL=${S3_USE_SSL}
+    # Health check para verificar que Celery worker está respondiendo
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "celery -A app.tasks.celery_app inspect ping -d celery@$$HOSTNAME || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
     restart: unless-stopped
 
   # SERVICIO DE CELERY BEAT PARA TAREAS PROGRAMADAS
@@ -207,6 +218,13 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+    # Health check para verificar que Celery beat está corriendo
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'celery.*beat' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
     restart: unless-stopped
 
   # SERVICIO DEL FRONTEND
@@ -236,6 +254,11 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      # Caché de navegadores de Playwright (persiste entre builds)
+      - playwright_cache:/ms-playwright
+      # Resultados de tests (accesibles desde host)
+      - ./frontend/test-results:/app/test-results
+      - ./frontend/playwright-report:/app/playwright-report
     depends_on:
       backend:
         condition: service_healthy
@@ -244,8 +267,21 @@ services:
     environment:
       - VITE_API_URL=http://backend:8000
       - BASE_URL=http://frontend:5173
+      - NODE_ENV=test
+      - CI=true
+      # Configuración de Playwright
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
     networks:
       - shared-network
+    # Health check para verificar que Playwright está listo
+    healthcheck:
+      test: ["CMD", "npx", "playwright", "--version"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 2
+    # Mantener el contenedor vivo para ejecutar tests manualmente
     command: ["sleep", "infinity"]
 
 volumes:
@@ -253,6 +289,7 @@ volumes:
   redis_data:
   minio_data:
   npm_cache:
+  playwright_cache:
 
 networks:
   shared-network:

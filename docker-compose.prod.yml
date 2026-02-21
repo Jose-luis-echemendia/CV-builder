@@ -33,7 +33,7 @@ services:
       db:
         condition: service_healthy
       prestart:
-        condition: service_completed_successfully  
+        condition: service_completed_successfully
     command: bash scripts/prestart.sh
     env_file:
       - .env
@@ -144,6 +144,18 @@ services:
     depends_on:
       - db
       - redis
+    # Health check para verificar que Celery worker está respondiendo
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "celery -A app.core.celery.celery_app inspect ping -d celery@$$HOSTNAME || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    restart: unless-stopped
 
   # SERVICIO DEL FRONTEND
   frontend:
@@ -181,6 +193,11 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      # Caché de navegadores de Playwright
+      - playwright_cache:/ms-playwright
+      # Resultados de tests
+      - ./frontend/test-results:/app/test-results
+      - ./frontend/playwright-report:/app/playwright-report
     depends_on:
       backend:
         condition: service_healthy
@@ -188,15 +205,29 @@ services:
         condition: service_started
     environment:
       - VITE_API_URL=http://backend:8000
-      - BASE_URL=http://frontend:5173  # <--- Playwright necesita saber dónde está la web
+      - BASE_URL=http://frontend:5173 # <--- Playwright necesita saber dónde está la web
+      - NODE_ENV=test
+      - CI=true
+      # Configuración de Playwright
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
     networks:
       - shared-network
+    # Health check para verificar que Playwright está listo
+    healthcheck:
+      test: ["CMD", "npx", "playwright", "--version"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 2
+    # En producción también mantener vivo para ejecutar tests bajo demanda
     command: ["sleep", "infinity"]
 
 volumes:
   featuremodels-db-data:
     external: true
   redis_data: {}
+  playwright_cache: {}
 
 networks:
   public:
