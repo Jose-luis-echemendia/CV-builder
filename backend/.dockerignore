@@ -1,8 +1,70 @@
 # Python
-__pycache__
-app.egg-info
-*.pyc
-.mypy_cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.mypy_cache/
+.pytest_cache/
 .coverage
-htmlcov
-.venv
+.coverage.*
+htmlcov/
+.tox/
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Tests
+.pytest_cache/
+test-results/
+
+# Documentation builds
+site/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic (keep alembic.ini)
+app/alembic/versions/__pycache__/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

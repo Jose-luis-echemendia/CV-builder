@@ -1,80 +1,77 @@
-FROM python:3.12-slim
+# =================================================================================
+#                        --- STAGE 1: BUILDER ---
+# =================================================================================
+FROM python:3.12-slim AS builder
 
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app/
 
 # Install system dependencies required for building Python packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     make \
     python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Install uv
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
 COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
 
-# Place executables in the environment at the front of the path
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
-ENV PATH="/app/.venv/bin:$PATH"
-
 # Compile bytecode
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#compiling-bytecode
 ENV UV_COMPILE_BYTECODE=1
-
 # uv Cache
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#caching
 ENV UV_LINK_MODE=copy
 
-# Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+# Install dependencies in a virtual environment
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project
-
-ENV PYTHONPATH=/app
-
+    uv sync --frozen --no-install-project --no-dev
 
 # =================================================================================
-#                  --- COPIA DE CARPETAS NECESARIOS ---
+#                     --- STAGE 2: RUNTIME ---
 # =================================================================================
+FROM python:3.12-slim AS runtime
 
-# Copy backend scripts
-COPY ./scripts /app/scripts
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PATH="/app/.venv/bin:$PATH"
 
-# copy config files
-COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
+WORKDIR /app/
 
-# copy backend sistem files
-COPY ./app /app/app
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# =================================================================================
-#          --- COPIA DE LAS 3 CARPETAS DE DOCUMENTACIÓN ---
-# =================================================================================
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser -u 1001 appuser
 
-# Copiar documentación del ROOT (docs/ en la raíz del proyecto)
-# Nota: En el contexto de build, ../docs NO funciona, por eso usamos volúmenes en docker-compose
-# En producción, estas carpetas se copiarán explícitamente
+# Copy virtual environment from builder
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 
-# Copiar documentación del BACKEND (backend/docs/)
-COPY ./docs /app/backend_docs
+# Copy application files
+COPY --chown=appuser:appuser ./pyproject.toml ./uv.lock ./alembic.ini /app/
+COPY --chown=appuser:appuser ./scripts /app/scripts
+COPY --chown=appuser:appuser ./app /app/app
+COPY --chown=appuser:appuser ./docs /app/backend_docs
 
-# Las carpetas root_docs y frontend_docs se montan via volúmenes en docker-compose
-# para desarrollo, y se copian en producción mediante CI/CD
+# Create directories for documentation
+RUN mkdir -p /app/internal_docs/docs && chown -R appuser:appuser /app/internal_docs
 
-# Crear carpeta de internal_docs si no existe
-RUN mkdir -p /app/internal_docs/docs
+# Switch to non-root user
+USER appuser
 
-# Sync the project
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
-# =================================================================================
-#                       --- COMANDO A EJECUTAR ---
-# =================================================================================
+EXPOSE 8000
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["fastapi", "run", "--workers", "4", "--host", "0.0.0.0", "app/main.py"]

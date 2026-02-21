@@ -1,13 +1,38 @@
-# Dockerfile.dev para desarrollo de frontend Vite
-FROM node:20
+# =================================================================================
+#          Dockerfile.dev - Optimizado para desarrollo con hot-reload
+# =================================================================================
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Install git for potential git operations (opcional, eliminar si no se necesita)
+RUN apk add --no-cache git
 
+# Copy package files first for better layer caching
+COPY package*.json ./
+
+# Configure npm for better network handling
+RUN npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm config set maxsockets 5
+
+# Install dependencies (usa npm install en dev para permitir actualizaciones)
+# Con timeouts más largos para evitar errores de red
+RUN npm install --prefer-online --no-audit --loglevel=verbose && \
+    npm cache clean --force
+
+# Copy source code (en dev, esto se sobreescribe con volúmenes en docker-compose)
 COPY . .
+
+# Create non-root user for development
+RUN addgroup -g 1001 -S nodeuser && \
+    adduser -S -D -H -u 1001 -h /app -s /bin/sh -G nodeuser -g nodeuser nodeuser && \
+    chown -R nodeuser:nodeuser /app
+
+USER nodeuser
 
 EXPOSE 5173
 
+# Use --host 0.0.0.0 to allow connections from outside the container
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

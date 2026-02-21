@@ -51,6 +51,7 @@ services:
   prestart:
     build:
       context: ./backend
+      dockerfile: Dockerfile.dev
     volumes:
       # Backend app files
       - ./backend/app:/app/app
@@ -93,6 +94,9 @@ services:
 
   # SERVICIO DEL BACKEND
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     depends_on:
       db:
         condition: service_healthy
@@ -135,9 +139,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-    build:
-      context: ./backend
     volumes:
       # Backend app files
       - ./backend/app:/app/app
@@ -158,7 +159,8 @@ services:
   celery_worker:
     build:
       context: ./backend
-    command: celery -A app.core.celery.celery_app worker --loglevel=info
+      dockerfile: Dockerfile.dev
+    command: bash scripts/start-celery-worker.sh
     volumes:
       - ./backend/app:/app/app
     env_file:
@@ -181,6 +183,31 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - S3_USE_SSL=${S3_USE_SSL}
+    restart: unless-stopped
+
+  # SERVICIO DE CELERY BEAT PARA TAREAS PROGRAMADAS
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    command: bash scripts/start-celery-beat.sh
+    volumes:
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+    restart: unless-stopped
 
   # SERVICIO DEL FRONTEND
   frontend:
@@ -193,6 +220,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      # Caché de npm para acelerar builds y evitar timeouts
+      - npm_cache:/root/.npm
     ports:
       - "5173:5173"
     environment:
@@ -223,6 +252,7 @@ volumes:
   app-db-data:
   redis_data:
   minio_data:
+  npm_cache:
 
 networks:
   shared-network:
