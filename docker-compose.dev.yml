@@ -163,6 +163,7 @@ services:
     command: bash scripts/start-celery-worker.sh
     volumes:
       - ./backend/app:/app/app
+      - ./scripts:/app/scripts
     env_file:
       - .env
     depends_on:
@@ -203,7 +204,7 @@ services:
       dockerfile: Dockerfile.dev
     command: bash scripts/start-celery-beat.sh
     volumes:
-      - ./app:/app/app
+      - ./backend/app:/app/app
       - ./scripts:/app/scripts
     depends_on:
       - redis

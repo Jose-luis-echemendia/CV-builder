@@ -6,7 +6,7 @@ echo "🚀 Iniciando Celery worker..."
 cd /app
 
 # Iniciar worker con logging
-celery -A app.celery_app worker \
+celery -A app.core.celery worker \
     --loglevel=info \
     --concurrency=4 \
     --max-tasks-per-child=1000 \

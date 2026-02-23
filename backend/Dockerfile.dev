@@ -28,17 +28,22 @@ ENV PATH="/app/.venv/bin:$PATH" \
     UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy
 
-# Install dependencies (including dev dependencies for development)
+# Install dependencies only (without building the local package)
+# --no-install-project avoids hatchling failing due to missing app/ directory
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen
+    uv sync --frozen --no-install-project
 
 # Copy application files (en dev, se sobrescribe con volúmenes)
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 COPY ./scripts /app/scripts
 COPY ./app /app/app
 COPY ./docs /app/backend_docs
+
+# Install the local project now that app/ is available
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
 
 # Create documentation directories
 RUN mkdir -p /app/internal_docs/docs
