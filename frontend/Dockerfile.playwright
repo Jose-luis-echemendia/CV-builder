@@ -26,9 +26,10 @@ RUN npm config set fetch-retry-maxtimeout 120000 && \
     npm config set audit false && \
     npm config set fund false
 
-# Instalar dependencias con optimizaciones de red
-# Usar npm install para flexibilidad en testing (igual que Dockerfile.dev)
-RUN npm install --prefer-online --no-audit --loglevel=error && \
+# Instalar dependencias con BuildKit cache mount para npm
+# BuildKit reutiliza el caché de npm entre rebuilds, acelerando significativamente la instalación
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --prefer-online --no-audit --loglevel=error && \
     npm cache clean --force
 
 # Verificar e instalar navegadores específicos para los tests

@@ -17,10 +17,11 @@ RUN npm config set fetch-retry-maxtimeout 120000 && \
     npm config set fetch-retries 5 && \
     npm config set maxsockets 5
 
-# Install dependencies (usa npm install en dev para permitir actualizaciones)
-# Con timeouts más largos para evitar errores de red
-RUN npm install --prefer-online --no-audit --loglevel=verbose && \
-    npm cache clean --force
+# Install dependencies with BuildKit cache mount for npm
+# BuildKit reuses npm cache across rebuilds, significantly speeding up dependency installation
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --prefer-online --no-audit --loglevel=error \
+    && npm cache clean --force
 
 # Copy source code (en dev, esto se sobreescribe con volúmenes en docker-compose)
 COPY . .
