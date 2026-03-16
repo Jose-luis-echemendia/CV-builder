@@ -1,4 +1,5 @@
-import type { ApiError } from "./client"
+
+import { ApiError } from "./client/core/ApiError"
 import useCustomToast from "./hooks/useCustomToast"
 
 export const emailPattern = {

@@ -1,7 +1,14 @@
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { OpenAPI } from "../client/core/OpenAPI"
-import type { UserPublic } from "../client/types.gen"
+
+export interface UserPublic {
+  id: string
+  email: string
+  full_name?: string | null
+  is_active?: boolean
+  is_superuser?: boolean
+}
 
 type AuthUser = UserPublic | null
 
@@ -16,7 +23,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set: (partial: AuthState | Partial<AuthState> | ((state: AuthState) => AuthState | Partial<AuthState>), replace?: boolean | undefined) => void) => ({
+    (set) => ({
       token: null,
       user: null,
       isAuthenticated: false,
@@ -29,7 +36,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user: AuthUser) => set({ user }),
 
       logout: () => {
-        // Limpiar cliente API
         OpenAPI.TOKEN = undefined
         set({ token: null, user: null, isAuthenticated: false })
       },
