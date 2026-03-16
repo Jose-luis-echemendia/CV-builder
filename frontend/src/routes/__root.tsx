@@ -1,13 +1,13 @@
-import { Outlet, createRootRoute } from "@tanstack/react-router"
-import React, { Suspense } from "react"
+import { Outlet, createRootRoute } from '@tanstack/react-router';
+import React, { Suspense } from 'react';
 
-import NotFound from "@/components/Common/NotFound"
+import NotFound from '@/components/Common/NotFound';
 import LoadingSuspense from '@/components/feedback/index';
 
 const loadDevtools = () =>
   Promise.all([
-    import("@tanstack/router-devtools"),
-    import("@tanstack/react-query-devtools"),
+    import('@tanstack/router-devtools'),
+    import('@tanstack/react-query-devtools'),
   ]).then(([routerDevtools, reactQueryDevtools]) => {
     return {
       default: () => (
@@ -16,22 +16,23 @@ const loadDevtools = () =>
           <reactQueryDevtools.ReactQueryDevtools />
         </>
       ),
-    }
-  })
+    };
+  });
 
-const TanStackDevtools =
-  process.env.NODE_ENV === "production" ? () => null : React.lazy(loadDevtools)
+const TanStackDevtools = import.meta.env.PROD
+  ? () => null
+  : React.lazy(loadDevtools);
 
 export const Route = createRootRoute({
   component: () => (
     <>
-      <Suspense fallback={LoadingSuspense}>
+      <Suspense fallback={<LoadingSuspense />}>
         <Outlet />
       </Suspense>
-      <Suspense fallback={LoadingSuspense}>
+      <Suspense fallback={<LoadingSuspense />}>
         <TanStackDevtools />
       </Suspense>
     </>
   ),
   notFoundComponent: () => <NotFound />,
-})
+});

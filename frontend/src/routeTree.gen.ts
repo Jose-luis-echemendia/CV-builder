@@ -12,12 +12,18 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
+import { Route as LayoutIndexImport } from './routes/_layout/index'
 
 // Create/Update Routes
 
 const LayoutRoute = LayoutImport.update({
   id: '/_layout',
   getParentRoute: () => rootRoute,
+} as any)
+
+const LayoutIndexRoute = LayoutIndexImport.update({
+  path: '/',
+  getParentRoute: () => LayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -28,11 +34,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
+    '/_layout/': {
+      preLoaderRoute: typeof LayoutIndexImport
+      parentRoute: typeof LayoutImport
+    }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren([LayoutRoute])
+export const routeTree = rootRoute.addChildren([
+  LayoutRoute.addChildren([LayoutIndexRoute]),
+])
 
 /* prettier-ignore-end */
