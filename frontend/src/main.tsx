@@ -18,7 +18,6 @@ import { setupApi } from './lib/api-config';
 
 setupApi();
 
-OpenAPI.BASE = import.meta.env.SECRET_KEY;
 OpenAPI.TOKEN = async () => {
   return localStorage.getItem('access_token') || '';
 };

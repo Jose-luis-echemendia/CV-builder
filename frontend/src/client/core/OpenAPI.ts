@@ -41,7 +41,7 @@ export type OpenAPIConfig = {
 }
 
 export const OpenAPI: OpenAPIConfig = {
-  BASE: "https://users.api.netsy.ai/docs#/",
+  BASE: "https://users.api.netsy.ai/api/v1",
   CREDENTIALS: "include",
   ENCODE_PATH: undefined,
   HEADERS: undefined,
