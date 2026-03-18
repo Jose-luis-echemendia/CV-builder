@@ -1,10 +1,12 @@
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation';
 import {
   RegisterFormData,
+  RegisterResponse,
   RegisterSchema,
 } from '@/schemas/auth/register.schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from '@tanstack/react-router';
 import {
   Box,
   Flex,
@@ -35,19 +37,27 @@ export const Register = () => {
     criteriaMode: 'all',
   });
 
+  const navigate = useNavigate();
   const { mutate: registerUser, isPending } = useRegisterMutation();
 
   const onSubmit = (data: RegisterFormData) => {
-    registerUser(data, {
-      onSuccess: () => {
+    const payload = {
+      email: data.email,
+      password: data.password,
+      platform:'CV'
+    };
+    registerUser(payload, {
+      onSuccess: (response: RegisterResponse) => {
         reset();
+        if (response.email_verification_sent) {
+          navigate({ to: '/verify-email' });
+        }
       },
     });
   };
 
   return (
     <Flex minH='100vh' bg='brand.bg'>
-      {/* Right Panel - Form */}
       <Flex
         flex='1'
         direction='column'
@@ -78,6 +88,7 @@ export const Register = () => {
               {/* Email */}
               <Field
                 label='CORREO ELECTRÓNICO'
+                color={'brand.primary'}
                 invalid={!!errors.email}
                 errorText={errors.email?.message}
               >
@@ -104,19 +115,37 @@ export const Register = () => {
               </Field>
 
               {/* Password */}
-              <PasswordInput
-                {...register('password')}
-                type='password'
-                errors={errors}
-                placeholder='••••••••'
-                bg='brand.bgMuted'
-                border='1px solid'
-                borderColor='brand.border'
-                color='brand.surface'
-                size='lg'
-                borderRadius={0}
-                startElement={<Icon as={FiLock} color='brand.textMuted' />}
-              />
+              <Field label='CONTRASEÑA' color={'brand.primary'}>
+                <PasswordInput
+                  {...register('password')}
+                  type='password'
+                  errors={errors}
+                  placeholder='••••••••'
+                  bg='brand.bgMuted'
+                  border='1px solid'
+                  borderColor='brand.border'
+                  color='brand.surface'
+                  size='lg'
+                  borderRadius={0}
+                  startElement={<Icon as={FiLock} color='brand.textMuted' />}
+                />
+              </Field>
+
+              <Field label='CONFIRMAR CONTRASEÑA' color={'brand.primary'}>
+                <PasswordInput
+                  {...register('confirmPassword')}
+                  type='confirmPassword'
+                  errors={errors}
+                  placeholder='••••••••'
+                  bg='brand.bgMuted'
+                  border='1px solid'
+                  borderColor='brand.border'
+                  color='brand.surface'
+                  size='lg'
+                  borderRadius={0}
+                  startElement={<Icon as={FiLock} color='brand.textMuted' />}
+                />
+              </Field>
 
               {/* Create Account Button */}
               <Button
