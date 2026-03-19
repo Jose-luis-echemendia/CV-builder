@@ -41,10 +41,12 @@ export const Register = () => {
   const { mutate: registerUser, isPending } = useRegisterMutation();
 
   const onSubmit = (data: RegisterFormData) => {
+    const appUrl = import.meta.env.VITE_APP_URL ?? window.location.origin;
     const payload = {
       email: data.email,
       password: data.password,
-      platform:'CV'
+      platform: 'cv-builder',
+      frontend_host: appUrl,
     };
     registerUser(payload, {
       onSuccess: (response: RegisterResponse) => {
