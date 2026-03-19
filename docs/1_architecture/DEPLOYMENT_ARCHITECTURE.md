@@ -129,7 +129,7 @@ Puerto Interno: 8000
 Redes: public, internal_network
 Healthcheck: curl http://localhost:8000/api/v1/utils/health-check/
 Variables de Entorno:
-  - POSTGRES_SERVER=db
+  - POSTGRES_HOST=db
   - POSTGRES_PORT=5432
   - DOMAIN, SECRET_KEY, etc.
 ```
@@ -201,13 +201,11 @@ Depende de: db, redis
 ### Niveles de Seguridad
 
 1. **Capa de Red**
-
    - Firewall del servidor: solo puertos 80, 443 abiertos
    - Redes Docker aisladas
    - Servicios internos NO expuestos directamente
 
 2. **Capa de Aplicación**
-
    - CORS configurado correctamente
    - JWT para autenticación
    - HTTPS obligatorio (redireccionamiento automático)
