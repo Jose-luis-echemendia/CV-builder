@@ -1,6 +1,6 @@
 # 📚 Comandos Esenciales del Backend
 
-Este documento contiene todos los comandos importantes para trabajar con el backend de Feature Models.
+Este documento contiene todos los comandos importantes para trabajar con el backend.
 
 ---
 

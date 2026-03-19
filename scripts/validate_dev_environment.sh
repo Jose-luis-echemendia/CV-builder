@@ -20,7 +20,7 @@ INFO="ℹ️"
 
 echo ""
 echo "======================================================================"
-echo "  🔍 VALIDACIÓN DEL ENTORNO DE DESARROLLO - Feature Models"
+echo "  🔍 VALIDACIÓN DEL ENTORNO DE DESARROLLO"
 echo "======================================================================"
 echo ""
 
