@@ -81,11 +81,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#la-estructura-de-carpetas-recomendada" class="md-skip">
-          Saltar a contenido
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -571,24 +566,6 @@
       
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Estructura de Carpetas
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -605,56 +582,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Tabla de contenidos
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#la-estructura-de-carpetas-recomendada" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        La Estructura de Carpetas Recomendada
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#explicacion-detallada-de-los-componentes-clave" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Explicación Detallada de los Componentes Clave
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#el-flujo-de-una-peticion-en-esta-arquitectura" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        El Flujo de una Petición en esta Arquitectura
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1355,47 +1282,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Tabla de contenidos
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#la-estructura-de-carpetas-recomendada" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        La Estructura de Carpetas Recomendada
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#explicacion-detallada-de-los-componentes-clave" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Explicación Detallada de los Componentes Clave
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#el-flujo-de-una-peticion-en-esta-arquitectura" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        El Flujo de una Petición en esta Arquitectura
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1413,164 +1299,120 @@
 
   <h1>Estructura de Carpetas</h1>
 
-<p>¡Excelente pregunta! Como experto en FastAPI, te puedo asegurar que su diseño, especialmente el sistema de Inyección de Dependencias, permite crear arquitecturas increíblemente limpias y robustas. La clave es pensar en capas y aprovechar al máximo las características del framework.</p>
-<p>Una estructura bien diseñada para una plataforma gigante y robusta con FastAPI se basa en estos principios:</p>
-<ol>
-<li><strong>Modularidad por Dominio (Features)</strong>: El código se agrupa por funcionalidad (<code>users</code>, <code>products</code>, <code>orders</code>), no por tipo de archivo (<code>views</code>, <code>models</code>).</li>
-<li><strong>Separación de Capas Claras</strong>: Se distingue nítidamente entre la capa de API (routers), la capa de lógica de negocio (servicios) y la capa de acceso a datos (CRUD/repositorios).</li>
-<li><strong>Inyección de Dependencias (DI)</strong>: Se utiliza el sistema de DI de FastAPI para todo: sesiones de base de datos, autenticación, etc. Esto desacopla los componentes y facilita enormemente las pruebas.</li>
-<li><strong>Tipado Estricto con Pydantic</strong>: Se usa Pydantic no solo para la validación de la API, sino también para la configuración y la definición de esquemas de datos claros en toda la aplicación.</li>
-</ol>
-<hr />
-<h3 id="la-estructura-de-carpetas-recomendada">La Estructura de Carpetas Recomendada<a class="headerlink" href="#la-estructura-de-carpetas-recomendada" title="Permanent link">&para;</a></h3>
-<p>Esta es una estructura probada en batalla que escala muy bien.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mi_plataforma_fastapi/
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── .env                 # Variables de entorno (SECRET_KEY, DATABASE_URL)
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── .env.example         # Plantilla de variables de entorno
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── .gitignore
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── pyproject.toml       # O requirements.txt. Define dependencias del proyecto.
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├── README.md
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── app/                 # Directorio principal del código fuente de la aplicación
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── __init__.py
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── main.py          # Punto de entrada de la aplicación FastAPI y unión de routers
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   ├── core/            # Configuración global, seguridad y lógica del núcleo
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   ├── __init__.py
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   │   ├── config.py    # Gestión de la configuración (usando Pydantic Settings)
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   │   └── security.py  # Funciones de hashing de contraseñas, creación/validación de JWT
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   │
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│   ├── db/              # Todo lo relacionado con la base de datos
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│   │   ├── __init__.py
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│   │   ├── base.py      # Base para los modelos de SQLAlchemy (DeclarativeBase)
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│   │   └── session.py   # Creación del motor de BD, SessionLocal y la dependencia get_db
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│   │
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│   ├── models/          # Modelos del ORM (SQLAlchemy)
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│   │   ├── __init__.py
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│   │   ├── user.py
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│   │   └── item.py
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   │
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   ├── schemas/         # Esquemas Pydantic (para validación de API y serialización)
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   │   ├── __init__.py
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   │   ├── user.py      # Schemas: UserCreate, UserUpdate, UserInDB, UserRead
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│   │   ├── item.py
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   │   └── token.py     # Schema para el token de autenticación
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│   │
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│   ├── crud/            # Capa de Acceso a Datos (Data Access Layer - DAL)
-</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│   │   ├── __init__.py
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│   │   ├── base.py      # Una clase base para CRUD (opcional, pero muy útil)
-</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│   │   ├── crud_user.py # Funciones CRUD para el modelo User
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│   │   └── crud_item.py
-</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│   │
-</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│   ├── services/        # Capa de Lógica de Negocio (Business Logic Layer - BLL)
-</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│   │   ├── __init__.py
-</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│   │   └── user_service.py # Orquesta operaciones complejas (ej. registrar usuario y enviar email)
-</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│   │
-</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│   └── api/             # Capa de API (Routers/Controllers)
-</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│       ├── __init__.py
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│       ├── deps.py      # Dependencias reutilizables de la API (ej. get_current_user)
-</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│       └── v1/          # Versión 1 de la API
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│           ├── __init__.py
-</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│           ├── api.py     # Archivo que une todos los routers de la v1
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│           ├── users.py   # Router para los endpoints de /users
-</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│           └── items.py   # Router para los endpoints de /items
-</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│
-</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>└── tests/               # Pruebas para la aplicación
-</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>    ├── __init__.py
-</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>    ├── conftest.py      # Fixtures de Pytest (ej. cliente de prueba, sesión de BD de prueba)
-</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>    └── api/
-</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>        └── v1/
-</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>            ├── test_users_api.py
-</span></code></pre></div>
-<hr />
-<h3 id="explicacion-detallada-de-los-componentes-clave">Explicación Detallada de los Componentes Clave<a class="headerlink" href="#explicacion-detallada-de-los-componentes-clave" title="Permanent link">&para;</a></h3>
-<h4 id="1-core-el-nucleo">1. <code>core/</code> - El Núcleo<a class="headerlink" href="#1-core-el-nucleo" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong><code>config.py</code></strong>: En lugar de leer variables de entorno directamente, se usa <code>pydantic.BaseSettings</code>. Esto te da validación de tipos, valores por defecto y carga automática desde archivos <code>.env</code>. Es extremadamente robusto.</li>
-<li><strong><code>security.py</code></strong>: Aísla toda la lógica criptográfica. Funciones como <code>verify_password</code>, <code>get_password_hash</code>, <code>create_access_token</code> viven aquí.</li>
-</ul>
-<h4 id="2-db-la-conexion">2. <code>db/</code> - La Conexión<a class="headerlink" href="#2-db-la-conexion" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong><code>session.py</code></strong>: Es uno de los archivos más importantes. Aquí defines el <code>engine</code> de SQLAlchemy, <code>SessionLocal</code> y, lo más crucial, la <strong>dependencia <code>get_db()</code></strong> que se inyectará en los endpoints de la API para proporcionar una sesión de base de datos.
-    <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># db/session.py (ejemplo simplificado)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">def</span> <span class="nf">get_db</span><span class="p">():</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">db</span> <span class="o">=</span> <span class="n">SessionLocal</span><span class="p">()</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">yield</span> <span class="n">db</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">finally</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span></code></pre></div></li>
-</ul>
-<h4 id="3-schemas-vs-models-la-separacion-esencial">3. <code>schemas/</code> vs <code>models/</code> - La Separación Esencial<a class="headerlink" href="#3-schemas-vs-models-la-separacion-esencial" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong><code>models/</code></strong>: Representa las tablas de tu base de datos (modelos de SQLAlchemy). Es la estructura interna de tus datos.</li>
-<li><strong><code>schemas/</code></strong>: Representa la "forma" de los datos que entran y salen de tu API (modelos Pydantic). Permite exponer solo ciertos campos, validar tipos y formatos. Por ejemplo, <code>UserInDB</code> podría tener el <code>hashed_password</code>, pero <code>UserRead</code> (el que se envía al cliente) no lo tendría. Esta separación es fundamental para la seguridad y la flexibilidad.</li>
-</ul>
-<h4 id="4-la-arquitectura-de-tres-capas-api-services-crud">4. La Arquitectura de Tres Capas (<code>api</code>, <code>services</code>, <code>crud</code>)<a class="headerlink" href="#4-la-arquitectura-de-tres-capas-api-services-crud" title="Permanent link">&para;</a></h4>
-<p>Esta es la verdadera clave para la escalabilidad.</p>
-<ul>
-<li>
-<p><strong><code>crud/</code> (Capa de Acceso a Datos)</strong>:</p>
-<ul>
-<li>Su única responsabilidad es interactuar con la base de datos.</li>
-<li>Contiene funciones simples como <code>get_user_by_email(db, email)</code>, <code>create_user(db, user_data)</code>.</li>
-<li>No contiene ninguna lógica de negocio. Solo <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>.</li>
-<li>Recibe una sesión de BD (<code>db</code>) y los datos necesarios.</li>
-</ul>
-</li>
-<li>
-<p><strong><code>services/</code> (Capa de Lógica de Negocio)</strong>:</p>
-<ul>
-<li><strong>Esta capa es opcional para endpoints simples, pero indispensable para plataformas complejas.</strong></li>
-<li>Orquesta la lógica que va más allá de un simple CRUD. Por ejemplo, una función <code>register_new_user</code> en <code>user_service.py</code> podría:<ol>
-<li>Llamar a <code>crud.get_user_by_email</code> para ver si el usuario ya existe.</li>
-<li>Llamar a <code>security.get_password_hash</code> para hashear la contraseña.</li>
-<li>Llamar a <code>crud.create_user</code> para guardar el nuevo usuario en la BD.</li>
-<li>Disparar una tarea para enviar un email de bienvenida.</li>
-</ol>
-</li>
-<li>Esta capa no sabe nada de HTTP (requests/responses). Se mantiene pura y reutilizable.</li>
-</ul>
-</li>
-<li>
-<p><strong><code>api/</code> (Capa de Presentación / Routers)</strong>:</p>
-<ul>
-<li>Es la capa más externa. Su única responsabilidad es manejar el protocolo HTTP.</li>
-<li>Define los endpoints (<code>@router.post("/users/")</code>).</li>
-<li>Usa la <strong>inyección de dependencias</strong> de FastAPI para obtener lo que necesita: <code>db: Session = Depends(get_db)</code>, <code>current_user: models.User = Depends(deps.get_current_active_user)</code>.</li>
-<li>Valida los datos de entrada usando los esquemas Pydantic.</li>
-<li><strong>Llama a la capa de servicios</strong> (o a la de CRUD para operaciones simples) para ejecutar la acción.</li>
-<li>Formatea la respuesta saliente usando los esquemas Pydantic.</li>
-</ul>
-</li>
-</ul>
-<h3 id="el-flujo-de-una-peticion-en-esta-arquitectura">El Flujo de una Petición en esta Arquitectura<a class="headerlink" href="#el-flujo-de-una-peticion-en-esta-arquitectura" title="Permanent link">&para;</a></h3>
-<p>Imaginemos una petición <code>POST /api/v1/users/</code> para registrar un usuario:</p>
-<ol>
-<li><strong>Routing</strong>: <code>main.py</code> delega <code>/api/v1</code> a <code>api/v1/api.py</code>, que a su vez incluye el router de <code>api/v1/users.py</code>.</li>
-<li><strong>Endpoint (<code>api/v1/users.py</code>)</strong>:<ul>
-<li>La función decorada con <code>@router.post("/")</code> se ejecuta.</li>
-<li>FastAPI automáticamente:<ul>
-<li>Valida el cuerpo de la petición contra el schema <code>schemas.user.UserCreate</code>.</li>
-<li>Ejecuta la dependencia <code>get_db</code> y le pasa la sesión (<code>db: Session</code>).</li>
-</ul>
-</li>
-<li>El endpoint llama a <code>user_service.register_new_user(db=db, user_data=user_in)</code>.</li>
-</ul>
-</li>
-<li><strong>Servicio (<code>services/user_service.py</code>)</strong>:<ul>
-<li>La función <code>register_new_user</code> ejecuta la lógica de negocio (verificar email, hashear contraseña) llamando a las funciones de <code>crud</code> y <code>security</code>.</li>
-<li>Devuelve el objeto <code>models.User</code> recién creado.</li>
-</ul>
-</li>
-<li><strong>Respuesta (<code>api/v1/users.py</code>)</strong>:<ul>
-<li>El endpoint recibe el objeto <code>models.User</code> del servicio.</li>
-<li>Gracias a <code>response_model=schemas.user.UserRead</code>, FastAPI automáticamente convierte el objeto del ORM al esquema Pydantic, filtrando campos sensibles como la contraseña.</li>
-<li>Envía la respuesta JSON al cliente con un código <code>201 Created</code>.</li>
-</ul>
-</li>
-</ol>
-<p>Adoptar esta estructura desde el principio te dará una base sólida, testable y mantenible que puede crecer para soportar una plataforma de cualquier tamaño.</p>
+<p>cv-generator/
+│
+├── app/
+│   ├── <strong>init</strong>.py
+│   ├── main.py
+│   ├── dependencies.py            # get_db, get_user_id (lee X-User-Id header)
+│   │
+│   ├── core/
+│   │   ├── <strong>init</strong>.py
+│   │   ├── config.py              # Settings: DB_URL, REDIS_URL, MINIO_*, SECRET_KEY
+│   │   ├── security.py            # ← tu módulo (require_api_key / require_admin_key)
+│   │   ├── database.py            # SQLAlchemy async engine + AsyncSession
+│   │   ├── redis.py               # Redis client (aioredis)
+│   │   ├── minio.py               # MinIO client + upload/presign helpers
+│   │   └── exceptions.py          # CVNotFound, TemplateNotFound, PDFGenerationError…
+│   │
+│   ├── models/                    # SQLAlchemy ORM — solo dominio CV
+│   │   ├── <strong>init</strong>.py
+│   │   ├── base.py                # DeclarativeBase + TimestampMixin (created_at/updated_at)
+│   │   ├── personal_info.py       # PersonalInfo  (1-1 con user_id externo)
+│   │   ├── project.py             # Project
+│   │   ├── project_section.py     # ProjectSection  (descripción + tag)
+│   │   ├── skill.py               # Skill + SkillCategory
+│   │   ├── cv_template.py         # CVTemplate  (nombre, preview_url, ruta jinja2)
+│   │   ├── cv.py                  # CV  (cabecera: título, job_target, estado…)
+│   │   └── cv_composition.py      # CVProject · CVSection · CVSkill  (selección)
+│   │
+│   ├── schemas/                   # Pydantic v2
+│   │   ├── <strong>init</strong>.py
+│   │   ├── common.py              # Pagination, MessageResponse, UUIDModel
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── project_section.py
+│   │   ├── skill.py
+│   │   ├── cv_template.py
+│   │   └── cv.py                  # CVCreate · CVRead · CVBuildRequest · CVStatusRead
+│   │
+│   ├── repositories/
+│   │   ├── <strong>init</strong>.py
+│   │   ├── base.py                # BaseRepository[Model] — CRUD genérico async
+│   │   ├── personal_info_repo.py
+│   │   ├── project_repo.py
+│   │   ├── skill_repo.py
+│   │   ├── cv_template_repo.py
+│   │   └── cv_repo.py
+│   │
+│   ├── services/
+│   │   ├── <strong>init</strong>.py
+│   │   ├── personal_info_service.py
+│   │   ├── project_service.py
+│   │   ├── skill_service.py
+│   │   ├── cv_template_service.py
+│   │   ├── cv_service.py          # ensambla datos → dispara tarea Celery
+│   │   └── pdf_service.py         # Jinja2 render → WeasyPrint → MinIO upload
+│   │
+│   ├── api/
+│   │   └── v1/
+│   │       ├── <strong>init</strong>.py
+│   │       ├── router.py          # agrega todos los sub-routers
+│   │       ├── personal_info.py   # GET/PUT  /me/personal-info
+│   │       ├── projects.py        # CRUD     /projects  +  /projects/{id}/sections
+│   │       ├── skills.py          # CRUD     /skills    +  /skills/categories
+│   │       ├── cv_templates.py    # GET      /templates  (admin: POST/DELETE)
+│   │       └── cvs.py             # CRUD     /cvs
+│   │                              # POST     /cvs/{id}/build
+│   │                              # GET      /cvs/{id}/status
+│   │                              # GET      /cvs/{id}/download  (presigned URL)
+│   │
+│   └── workers/
+│       ├── <strong>init</strong>.py
+│       ├── celery_app.py          # Celery instance + config
+│       ├── beat_schedule.py       # cleanup_expired_pdfs cada 24 h
+│       └── tasks/
+│           ├── <strong>init</strong>.py
+│           ├── pdf_tasks.py       # <a class="magiclink magiclink-github magiclink-mention" href="https://github.com/shared_task" title="GitHub User: shared_task">@shared_task</a> generate_cv_pdf(cv_id, user_id)
+│           └── cleanup_tasks.py   # elimina PDFs expirados de MinIO + marca CV
+│
+├── cv_templates/                  # Plantillas Jinja2 para generación PDF
+│   ├── modern/
+│   │   ├── template.html.j2
+│   │   └── style.css
+│   ├── classic/
+│   │   ├── template.html.j2
+│   │   └── style.css
+│   └── minimal/
+│       ├── template.html.j2
+│       └── style.css
+│
+├── migrations/
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│
+├── tests/
+│   ├── conftest.py                # fixtures: async client, test DB, fake user_id header
+│   ├── factories/
+│   │   ├── project_factory.py
+│   │   ├── skill_factory.py
+│   │   └── cv_factory.py
+│   └── test_api/
+│       ├── test_personal_info.py
+│       ├── test_projects.py
+│       ├── test_skills.py
+│       ├── test_cvs.py
+│       └── test_pdf_generation.py
+│
+├── docker/
+│   ├── Dockerfile                 # API
+│   └── Dockerfile.worker          # Celery worker + beat
+│
+├── docker-compose.yml
+├── pyproject.toml
+├── alembic.ini
+└── .env.example</p>
 
 
 

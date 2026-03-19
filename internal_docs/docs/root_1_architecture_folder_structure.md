@@ -1,147 +1,114 @@
-
-¡Excelente pregunta! Como experto en FastAPI, te puedo asegurar que su diseño, especialmente el sistema de Inyección de Dependencias, permite crear arquitecturas increíblemente limpias y robustas. La clave es pensar en capas y aprovechar al máximo las características del framework.
-
-Una estructura bien diseñada para una plataforma gigante y robusta con FastAPI se basa en estos principios:
-
-1.  **Modularidad por Dominio (Features)**: El código se agrupa por funcionalidad (`users`, `products`, `orders`), no por tipo de archivo (`views`, `models`).
-2.  **Separación de Capas Claras**: Se distingue nítidamente entre la capa de API (routers), la capa de lógica de negocio (servicios) y la capa de acceso a datos (CRUD/repositorios).
-3.  **Inyección de Dependencias (DI)**: Se utiliza el sistema de DI de FastAPI para todo: sesiones de base de datos, autenticación, etc. Esto desacopla los componentes y facilita enormemente las pruebas.
-4.  **Tipado Estricto con Pydantic**: Se usa Pydantic no solo para la validación de la API, sino también para la configuración y la definición de esquemas de datos claros en toda la aplicación.
-
----
-
-### La Estructura de Carpetas Recomendada
-
-Esta es una estructura probada en batalla que escala muy bien.
-
-```
-mi_plataforma_fastapi/
-├── .env                 # Variables de entorno (SECRET_KEY, DATABASE_URL)
-├── .env.example         # Plantilla de variables de entorno
-├── .gitignore
-├── pyproject.toml       # O requirements.txt. Define dependencias del proyecto.
-├── README.md
+cv-generator/
 │
-├── app/                 # Directorio principal del código fuente de la aplicación
+├── app/
 │   ├── __init__.py
-│   ├── main.py          # Punto de entrada de la aplicación FastAPI y unión de routers
+│   ├── main.py
+│   ├── dependencies.py            # get_db, get_user_id (lee X-User-Id header)
 │   │
-│   ├── core/            # Configuración global, seguridad y lógica del núcleo
+│   ├── core/
 │   │   ├── __init__.py
-│   │   ├── config.py    # Gestión de la configuración (usando Pydantic Settings)
-│   │   └── security.py  # Funciones de hashing de contraseñas, creación/validación de JWT
+│   │   ├── config.py              # Settings: DB_URL, REDIS_URL, MINIO_*, SECRET_KEY
+│   │   ├── security.py            # ← tu módulo (require_api_key / require_admin_key)
+│   │   ├── database.py            # SQLAlchemy async engine + AsyncSession
+│   │   ├── redis.py               # Redis client (aioredis)
+│   │   ├── minio.py               # MinIO client + upload/presign helpers
+│   │   └── exceptions.py          # CVNotFound, TemplateNotFound, PDFGenerationError…
 │   │
-│   ├── db/              # Todo lo relacionado con la base de datos
+│   ├── models/                    # SQLAlchemy ORM — solo dominio CV
 │   │   ├── __init__.py
-│   │   ├── base.py      # Base para los modelos de SQLAlchemy (DeclarativeBase)
-│   │   └── session.py   # Creación del motor de BD, SessionLocal y la dependencia get_db
+│   │   ├── base.py                # DeclarativeBase + TimestampMixin (created_at/updated_at)
+│   │   ├── personal_info.py       # PersonalInfo  (1-1 con user_id externo)
+│   │   ├── project.py             # Project
+│   │   ├── project_section.py     # ProjectSection  (descripción + tag)
+│   │   ├── skill.py               # Skill + SkillCategory
+│   │   ├── cv_template.py         # CVTemplate  (nombre, preview_url, ruta jinja2)
+│   │   ├── cv.py                  # CV  (cabecera: título, job_target, estado…)
+│   │   └── cv_composition.py      # CVProject · CVSection · CVSkill  (selección)
 │   │
-│   ├── models/          # Modelos del ORM (SQLAlchemy)
+│   ├── schemas/                   # Pydantic v2
 │   │   ├── __init__.py
-│   │   ├── user.py
-│   │   └── item.py
+│   │   ├── common.py              # Pagination, MessageResponse, UUIDModel
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── project_section.py
+│   │   ├── skill.py
+│   │   ├── cv_template.py
+│   │   └── cv.py                  # CVCreate · CVRead · CVBuildRequest · CVStatusRead
 │   │
-│   ├── schemas/         # Esquemas Pydantic (para validación de API y serialización)
+│   ├── repositories/
 │   │   ├── __init__.py
-│   │   ├── user.py      # Schemas: UserCreate, UserUpdate, UserInDB, UserRead
-│   │   ├── item.py
-│   │   └── token.py     # Schema para el token de autenticación
+│   │   ├── base.py                # BaseRepository[Model] — CRUD genérico async
+│   │   ├── personal_info_repo.py
+│   │   ├── project_repo.py
+│   │   ├── skill_repo.py
+│   │   ├── cv_template_repo.py
+│   │   └── cv_repo.py
 │   │
-│   ├── crud/            # Capa de Acceso a Datos (Data Access Layer - DAL)
+│   ├── services/
 │   │   ├── __init__.py
-│   │   ├── base.py      # Una clase base para CRUD (opcional, pero muy útil)
-│   │   ├── crud_user.py # Funciones CRUD para el modelo User
-│   │   └── crud_item.py
+│   │   ├── personal_info_service.py
+│   │   ├── project_service.py
+│   │   ├── skill_service.py
+│   │   ├── cv_template_service.py
+│   │   ├── cv_service.py          # ensambla datos → dispara tarea Celery
+│   │   └── pdf_service.py         # Jinja2 render → WeasyPrint → MinIO upload
 │   │
-│   ├── services/        # Capa de Lógica de Negocio (Business Logic Layer - BLL)
-│   │   ├── __init__.py
-│   │   └── user_service.py # Orquesta operaciones complejas (ej. registrar usuario y enviar email)
+│   ├── api/
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       ├── router.py          # agrega todos los sub-routers
+│   │       ├── personal_info.py   # GET/PUT  /me/personal-info
+│   │       ├── projects.py        # CRUD     /projects  +  /projects/{id}/sections
+│   │       ├── skills.py          # CRUD     /skills    +  /skills/categories
+│   │       ├── cv_templates.py    # GET      /templates  (admin: POST/DELETE)
+│   │       └── cvs.py             # CRUD     /cvs
+│   │                              # POST     /cvs/{id}/build
+│   │                              # GET      /cvs/{id}/status
+│   │                              # GET      /cvs/{id}/download  (presigned URL)
 │   │
-│   └── api/             # Capa de API (Routers/Controllers)
+│   └── workers/
 │       ├── __init__.py
-│       ├── deps.py      # Dependencias reutilizables de la API (ej. get_current_user)
-│       └── v1/          # Versión 1 de la API
+│       ├── celery_app.py          # Celery instance + config
+│       ├── beat_schedule.py       # cleanup_expired_pdfs cada 24 h
+│       └── tasks/
 │           ├── __init__.py
-│           ├── api.py     # Archivo que une todos los routers de la v1
-│           ├── users.py   # Router para los endpoints de /users
-│           └── items.py   # Router para los endpoints de /items
+│           ├── pdf_tasks.py       # @shared_task generate_cv_pdf(cv_id, user_id)
+│           └── cleanup_tasks.py   # elimina PDFs expirados de MinIO + marca CV
 │
-└── tests/               # Pruebas para la aplicación
-    ├── __init__.py
-    ├── conftest.py      # Fixtures de Pytest (ej. cliente de prueba, sesión de BD de prueba)
-    └── api/
-        └── v1/
-            ├── test_users_api.py
-```
-
----
-
-### Explicación Detallada de los Componentes Clave
-
-#### 1. `core/` - El Núcleo
-*   **`config.py`**: En lugar de leer variables de entorno directamente, se usa `pydantic.BaseSettings`. Esto te da validación de tipos, valores por defecto y carga automática desde archivos `.env`. Es extremadamente robusto.
-*   **`security.py`**: Aísla toda la lógica criptográfica. Funciones como `verify_password`, `get_password_hash`, `create_access_token` viven aquí.
-
-#### 2. `db/` - La Conexión
-*   **`session.py`**: Es uno de los archivos más importantes. Aquí defines el `engine` de SQLAlchemy, `SessionLocal` y, lo más crucial, la **dependencia `get_db()`** que se inyectará en los endpoints de la API para proporcionar una sesión de base de datos.
-    ```python
-    # db/session.py (ejemplo simplificado)
-    def get_db():
-        db = SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-    ```
-
-#### 3. `schemas/` vs `models/` - La Separación Esencial
-*   **`models/`**: Representa las tablas de tu base de datos (modelos de SQLAlchemy). Es la estructura interna de tus datos.
-*   **`schemas/`**: Representa la "forma" de los datos que entran y salen de tu API (modelos Pydantic). Permite exponer solo ciertos campos, validar tipos y formatos. Por ejemplo, `UserInDB` podría tener el `hashed_password`, pero `UserRead` (el que se envía al cliente) no lo tendría. Esta separación es fundamental para la seguridad y la flexibilidad.
-
-#### 4. La Arquitectura de Tres Capas (`api`, `services`, `crud`)
-
-Esta es la verdadera clave para la escalabilidad.
-
-*   **`crud/` (Capa de Acceso a Datos)**:
-    *   Su única responsabilidad es interactuar con la base de datos.
-    *   Contiene funciones simples como `get_user_by_email(db, email)`, `create_user(db, user_data)`.
-    *   No contiene ninguna lógica de negocio. Solo `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
-    *   Recibe una sesión de BD (`db`) y los datos necesarios.
-
-*   **`services/` (Capa de Lógica de Negocio)**:
-    *   **Esta capa es opcional para endpoints simples, pero indispensable para plataformas complejas.**
-    *   Orquesta la lógica que va más allá de un simple CRUD. Por ejemplo, una función `register_new_user` en `user_service.py` podría:
-        1.  Llamar a `crud.get_user_by_email` para ver si el usuario ya existe.
-        2.  Llamar a `security.get_password_hash` para hashear la contraseña.
-        3.  Llamar a `crud.create_user` para guardar el nuevo usuario en la BD.
-        4.  Disparar una tarea para enviar un email de bienvenida.
-    *   Esta capa no sabe nada de HTTP (requests/responses). Se mantiene pura y reutilizable.
-
-*   **`api/` (Capa de Presentación / Routers)**:
-    *   Es la capa más externa. Su única responsabilidad es manejar el protocolo HTTP.
-    *   Define los endpoints (`@router.post("/users/")`).
-    *   Usa la **inyección de dependencias** de FastAPI para obtener lo que necesita: `db: Session = Depends(get_db)`, `current_user: models.User = Depends(deps.get_current_active_user)`.
-    *   Valida los datos de entrada usando los esquemas Pydantic.
-    *   **Llama a la capa de servicios** (o a la de CRUD para operaciones simples) para ejecutar la acción.
-    *   Formatea la respuesta saliente usando los esquemas Pydantic.
-
-### El Flujo de una Petición en esta Arquitectura
-
-Imaginemos una petición `POST /api/v1/users/` para registrar un usuario:
-
-1.  **Routing**: `main.py` delega `/api/v1` a `api/v1/api.py`, que a su vez incluye el router de `api/v1/users.py`.
-2.  **Endpoint (`api/v1/users.py`)**:
-    *   La función decorada con `@router.post("/")` se ejecuta.
-    *   FastAPI automáticamente:
-        *   Valida el cuerpo de la petición contra el schema `schemas.user.UserCreate`.
-        *   Ejecuta la dependencia `get_db` y le pasa la sesión (`db: Session`).
-    *   El endpoint llama a `user_service.register_new_user(db=db, user_data=user_in)`.
-3.  **Servicio (`services/user_service.py`)**:
-    *   La función `register_new_user` ejecuta la lógica de negocio (verificar email, hashear contraseña) llamando a las funciones de `crud` y `security`.
-    *   Devuelve el objeto `models.User` recién creado.
-4.  **Respuesta (`api/v1/users.py`)**:
-    *   El endpoint recibe el objeto `models.User` del servicio.
-    *   Gracias a `response_model=schemas.user.UserRead`, FastAPI automáticamente convierte el objeto del ORM al esquema Pydantic, filtrando campos sensibles como la contraseña.
-    *   Envía la respuesta JSON al cliente con un código `201 Created`.
-
-Adoptar esta estructura desde el principio te dará una base sólida, testable y mantenible que puede crecer para soportar una plataforma de cualquier tamaño.
+├── cv_templates/                  # Plantillas Jinja2 para generación PDF
+│   ├── modern/
+│   │   ├── template.html.j2
+│   │   └── style.css
+│   ├── classic/
+│   │   ├── template.html.j2
+│   │   └── style.css
+│   └── minimal/
+│       ├── template.html.j2
+│       └── style.css
+│
+├── migrations/
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│
+├── tests/
+│   ├── conftest.py                # fixtures: async client, test DB, fake user_id header
+│   ├── factories/
+│   │   ├── project_factory.py
+│   │   ├── skill_factory.py
+│   │   └── cv_factory.py
+│   └── test_api/
+│       ├── test_personal_info.py
+│       ├── test_projects.py
+│       ├── test_skills.py
+│       ├── test_cvs.py
+│       └── test_pdf_generation.py
+│
+├── docker/
+│   ├── Dockerfile                 # API
+│   └── Dockerfile.worker          # Celery worker + beat
+│
+├── docker-compose.yml
+├── pyproject.toml
+├── alembic.ini
+└── .env.example
