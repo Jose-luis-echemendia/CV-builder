@@ -147,9 +147,15 @@ app.include_router(api_router_v1, prefix=settings.API_V1_PREFIX)
 setup_admin(app)
 
 
+# ========================================================================
+#             --- Welcome Response y Healt Check (ROOT) ---
+# ========================================================================
+
 @app.get("/", response_model=WelcomeResponse)
 def read_root():
-    """ """
+    
+    log.info("app.root_accessed", message="Endpoint raíz accedido")
+    
     return WelcomeResponse(
         message=f"Welcome to {settings.APP_NAME}",
         project=settings.APP_NAME,
@@ -157,9 +163,13 @@ def read_root():
         environment=settings.ENVIRONMENT,
     )
     
+    
 @app.get("/health", tags=["health"], include_in_schema=False)
 async def health() -> dict:
     from app.core.cache import cache_service
+    
+    log.info("app.health_check", message="Health check endpoint accedido")
+    
     return {
         "status":   "ok",
         "env":      settings.ENVIRONMENT,

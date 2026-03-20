@@ -1,9 +1,8 @@
 """Esquemas Pydantic para endpoints de utilidad."""
 
-from typing import Any, Literal
 
 from pydantic import BaseModel
-
+from app.enums import Environment
 
 class WelcomeResponse(BaseModel):
     """Respuesta del endpoint raíz."""
@@ -11,4 +10,4 @@ class WelcomeResponse(BaseModel):
     message: str
     project: str
     version: str | None = None
-    environment: Literal["local", "staging", "production"] = "local"
+    environment: Environment = Environment.DEVELOPMENT
