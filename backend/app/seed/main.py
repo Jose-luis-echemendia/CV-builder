@@ -14,11 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.db import a_engine
 from .seeders import (
-    create_first_superuser,
     seed_settings,
-    seed_production_users,
-    seed_development_users,
-    get_admin_user,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -31,8 +27,6 @@ async def seed_production(session: AsyncSession) -> None:
 
     Solo crea:
     - Configuraciones de aplicación
-    - FIRST_SUPERUSER desde variables de entorno
-    - Usuarios de producción (sin contraseñas de prueba)
     """
 
     logger.info("=" * 70)
@@ -41,12 +35,6 @@ async def seed_production(session: AsyncSession) -> None:
 
     # 1. Settings
     await seed_settings(session)
-
-    # 2. FIRST_SUPERUSER
-    await create_first_superuser(session)
-
-    # 3. Usuarios de producción
-    await seed_production_users(session)
 
     logger.info("=" * 70)
     logger.info("✅ SEEDING DE PRODUCCIÓN COMPLETADO")
@@ -57,42 +45,16 @@ async def seed_development(session: AsyncSession) -> None:
     """
     Seeding para entorno de desarrollo/testing
 
-    Crea todos los datos de ejemplo incluyendo:
-    - FIRST_SUPERUSER desde variables de entorno
-    - Usuarios de desarrollo con contraseñas conocidas
-    - Dominios académicos de ejemplo
-    - Etiquetas pedagógicas
-    - Recursos educativos
-    - Planes de estudio y modelos curriculares de ejemplo
+    Crea datos de ejemplo de configuración para entorno de desarrollo/testing.
     """
 
     logger.info("=" * 70)
     logger.info("🧪 SEEDING DE DESARROLLO")
     logger.info("=" * 70)
 
-    # 1. FIRST_SUPERUSER
-    await create_first_superuser(session)
-
-    # 2. Usuarios de desarrollo
-    dev_users = await seed_development_users(session)
-
-    # 3. Obtener admin para crear otros datos
-    admin = await get_admin_user(session)
-    if not admin:
-        logger.error("❌ No se encontró usuario admin, abortando seeding de desarrollo")
-        return
-
-    # =================================================================================
-    # Datos de desarrollo
-    # =================================================================================
-
     logger.info("=" * 70)
     logger.info("✅ SEEDING DE DESARROLLO COMPLETADO")
     logger.info("=" * 70)
-    logger.info("")
-    logger.info("📝 CREDENCIALES DE PRUEBA:")
-    logger.info("  Admin:               admin@example.com / admin123")
-    logger.info("")
 
 
 async def seed_all(environment: str = "local") -> None:
