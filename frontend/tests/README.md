@@ -391,9 +391,8 @@ CI=true npx playwright test --reporter=github
 
 Si tienes problemas:
 
-1. Revisa [docs/2_configuration/playwright-optimization.md](../../docs/2_configuration/playwright-optimization.md)
-2. Ejecuta `./run-playwright-tests.sh shell` para inspeccionar
-3. Verifica los logs: `docker compose -f docker-compose.dev.yml logs playwright`
-4. Limpia y reconstruye todo
+1. Ejecuta `./run-playwright-tests.sh shell` para inspeccionar
+2. Verifica los logs: `docker compose -f docker-compose.dev.yml logs playwright`
+3. Limpia y reconstruye todo
 
 Happy Testing! 🎭

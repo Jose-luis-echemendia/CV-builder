@@ -12,25 +12,31 @@
         <meta name="author" content="Equipo de Desarrollo">
       
       
+        <link rel="canonical" href="http://localhost:8000/internal-docs/backend_db/">
       
+      
+        <link rel="prev" href="../backend_commands/">
+      
+      
+        <link rel="next" href="../backend_migrations/">
       
       
         
       
       
-      <link rel="icon" href="/internal-docs/assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
     
     
       
-        <title>Documentación Interna de la Plataforma</title>
+        <title>Base de Datos - Documentación Interna de la Plataforma</title>
       
     
     
-      <link rel="stylesheet" href="/internal-docs/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/internal-docs/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="/internal-docs/stylesheets/extra.css">
+      <link rel="stylesheet" href="../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("/internal-docs/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -87,7 +93,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabecera">
-    <a href="/internal-docs/." title="Documentación Interna de la Plataforma" class="md-header__button md-logo" aria-label="Documentación Interna de la Plataforma" data-md-component="logo">
+    <a href=".." title="Documentación Interna de la Plataforma" class="md-header__button md-logo" aria-label="Documentación Interna de la Plataforma" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -107,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Base de Datos
             
           </span>
         </div>
@@ -207,7 +213,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/internal-docs/." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -228,7 +234,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/internal-docs/root_index/" class="md-tabs__link">
+        <a href="../root_index/" class="md-tabs__link">
           
   
   
@@ -244,11 +250,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/internal-docs/backend_README.md" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../backend_README.md" class="md-tabs__link">
           
   
   
@@ -268,7 +276,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/internal-docs/frontend_README.md" class="md-tabs__link">
+        <a href="../frontend_README.md" class="md-tabs__link">
           
   
   
@@ -308,7 +316,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegación" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/internal-docs/." title="Documentación Interna de la Plataforma" class="md-nav__button md-logo" aria-label="Documentación Interna de la Plataforma" data-md-component="logo">
+    <a href=".." title="Documentación Interna de la Plataforma" class="md-nav__button md-logo" aria-label="Documentación Interna de la Plataforma" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -326,7 +334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -405,7 +413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_index/" class="md-nav__link">
+      <a href="../root_index/" class="md-nav__link">
         
   
   
@@ -433,7 +441,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_README/" class="md-nav__link">
+      <a href="../root_README/" class="md-nav__link">
         
   
   
@@ -461,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_requirements/" class="md-nav__link">
+      <a href="../root_requirements/" class="md-nav__link">
         
   
   
@@ -541,7 +549,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_1_architecture_folder_structure/" class="md-nav__link">
+      <a href="../root_1_architecture_folder_structure/" class="md-nav__link">
         
   
   
@@ -569,7 +577,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_1_architecture_db/" class="md-nav__link">
+      <a href="../root_1_architecture_db/" class="md-nav__link">
         
   
   
@@ -597,7 +605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_1_architecture_DEPLOYMENT_ARCHITECTURE/" class="md-nav__link">
+      <a href="../root_1_architecture_DEPLOYMENT_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -685,7 +693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_2_configuration_development/" class="md-nav__link">
+      <a href="../root_2_configuration_development/" class="md-nav__link">
         
   
   
@@ -713,7 +721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/root_2_configuration_deployment/" class="md-nav__link">
+      <a href="../root_2_configuration_deployment/" class="md-nav__link">
         
   
   
@@ -753,26 +761,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -790,7 +803,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -808,7 +821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/backend_README.md" class="md-nav__link">
+      <a href="../backend_README.md" class="md-nav__link">
         
   
   
@@ -836,7 +849,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/backend_commands/" class="md-nav__link">
+      <a href="../backend_commands/" class="md-nav__link">
         
   
   
@@ -861,10 +874,17 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/internal-docs/backend_db/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -880,6 +900,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -892,7 +913,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/backend_architecture.md" class="md-nav__link">
+      <a href="../backend_architecture.md" class="md-nav__link">
         
   
   
@@ -926,17 +947,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
             
   
   
@@ -972,7 +996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/backend_PRESTART_SERVICE.md" class="md-nav__link">
+      <a href="../backend_PRESTART_SERVICE.md" class="md-nav__link">
         
   
   
@@ -1000,7 +1024,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/backend_migrations/" class="md-nav__link">
+      <a href="../backend_migrations/" class="md-nav__link">
         
   
   
@@ -1095,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/internal-docs/frontend_README.md" class="md-nav__link">
+      <a href="../frontend_README.md" class="md-nav__link">
         
   
   
@@ -1152,8 +1176,26 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+
+  <h1>Base de Datos</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -1209,12 +1251,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/internal-docs/", "features": ["navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "/internal-docs/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
-      <script src="/internal-docs/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="/internal-docs/javascripts/extra.js"></script>
+        <script src="../javascripts/extra.js"></script>
       
     
   </body>

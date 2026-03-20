@@ -125,7 +125,7 @@ celery_app.conf.update(
 )
 
 # ── Importar el schedule aquí para evitar importaciones circulares ────────────
-from app.workers.beat_schedule import BEAT_SCHEDULE  # noqa: E402
+from app.tasks.beat_schedule import BEAT_SCHEDULE  # noqa: E402
 celery_app.conf.beat_schedule = BEAT_SCHEDULE
 
 

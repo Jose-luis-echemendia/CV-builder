@@ -1,7 +1,7 @@
 site_name: Documentación Interna de la Plataforma
 site_description: Documentación técnica completa del proyecto - Root, Backend y Frontend
 site_author: Equipo de Desarrollo
-site_url: !ENV [DOCS_URL, 'http://localhost:8000/internal-docs/']
+site_url: !ENV [DOCS_URL, "http://localhost:8000/internal-docs/"]
 use_directory_urls: true
 
 theme:
@@ -39,7 +39,7 @@ theme:
 
 nav:
   - 🏠 Inicio: index.md
-  
+
   - 📦 Proyecto (Root):
       - Índice: root_index.md
       - README: root_README.md
@@ -51,20 +51,14 @@ nav:
       - Configuración:
           - Desarrollo: root_2_configuration_development.md
           - Despliegue: root_2_configuration_deployment.md
-  
+
   - ⚙️ Backend:
-      - Índice: backend_README.md
       - Comandos: backend_commands.md
       - Base de Datos: backend_db.md
-      - Arquitectura: backend_architecture.md
       - Documentación Técnica:
-          - Servicio Prestart: backend_PRESTART_SERVICE.md
           # - Login Endpoints : backend_LOGIN_ENDPOINTS.md
           # - User Endpoints : backend_USER_ENDPOINTS.md
           - Migraciones: backend_migrations.md
-          
-  - 🎨 Frontend:
-      - Índice: frontend_README.md
 
 markdown_extensions:
   - toc:
@@ -119,14 +113,14 @@ plugins:
 
 extra:
   # URLs dinámicas basadas en variables de entorno
-  domain: !ENV [DOMAIN, 'http://localhost:8000']
-  frontend_url: !ENV [FRONTEND_URL, 'http://localhost:3000']
-  
+  domain: !ENV [DOMAIN, "http://localhost:8000"]
+  frontend_url: !ENV [FRONTEND_URL, "http://localhost:3000"]
+
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Jose-luis-echemendia/feature_model
       name: GitHub Repository
-  
+
   generator: true
 
 extra_css:

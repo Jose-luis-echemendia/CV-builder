@@ -9,11 +9,23 @@
          <lastmod>2026-03-20</lastmod>
     </url>
     <url>
+         <loc>http://localhost:8000/internal-docs/backend_db/</loc>
+         <lastmod>2026-03-20</lastmod>
+    </url>
+    <url>
+         <loc>http://localhost:8000/internal-docs/backend_migrations/</loc>
+         <lastmod>2026-03-20</lastmod>
+    </url>
+    <url>
          <loc>http://localhost:8000/internal-docs/root_1_architecture_ARCHITECTURAL_PATTERN_ANALYSIS/</loc>
          <lastmod>2026-03-20</lastmod>
     </url>
     <url>
          <loc>http://localhost:8000/internal-docs/root_1_architecture_DEPLOYMENT_ARCHITECTURE/</loc>
+         <lastmod>2026-03-20</lastmod>
+    </url>
+    <url>
+         <loc>http://localhost:8000/internal-docs/root_1_architecture_db/</loc>
          <lastmod>2026-03-20</lastmod>
     </url>
     <url>

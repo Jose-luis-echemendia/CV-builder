@@ -24,7 +24,7 @@ Documentación general del proyecto, arquitectura global y configuración de des
 
 API, modelos de datos, servicios, migraciones y documentación técnica del backend.
 
-[:octicons-arrow-right-24: **Explorar Documentación del Backend**](backend_README.md){ .md-button .md-button--primary }
+[:octicons-arrow-right-24: **Explorar Documentación del Backend**](backend_commands.md){ .md-button .md-button--primary }
 
 ---
 
@@ -65,33 +65,9 @@ Documentación técnica del backend (FastAPI + PostgreSQL):
 
 **Core:**
 
-- [README Backend](backend_README.md) - Introducción y setup
 - [Comandos](backend_commands.md) - Comandos útiles de desarrollo
 - [Base de Datos](backend_db.md) - Esquema y migraciones
-- [Arquitectura S3](backend_s3_architecture.md) - Gestión de archivos
-
-**Refactorings y Mejoras:**
-
-- [Cambios Educativos](backend_CAMBIOS_EDUCATIVOS.md)
-- [Login Endpoints Refactor](backend_LOGIN_ENDPOINTS_REFACTOR.md)
-- [Resumen Refactor Login](backend_LOGIN_REFACTOR_SUMMARY.md)
-- [Maestría Ciencia de Datos](backend_MAESTRIA_CIENCIA_DATOS.md)
-- [Orden de Migraciones](backend_MIGRATION_ORDER_FIX.md)
-- [Servicio Prestart](backend_PRESTART_SERVICE.md)
-
-**Servicios S3:**
-
-- [Refactoring S3](backend_README_S3_REFACTORING.md)
-- [Ejemplos S3 Dependencies](backend_s3_dependency_examples.md)
-- [Cambios Servicio S3](backend_s3_service_changes.md)
-- [Uso Servicio S3](backend_s3_service_usage.md)
-
-**Gestión de Usuarios:**
-
-- [Migración User Endpoints](backend_user_endpoints_migration.md)
-- [Roles de Usuario](backend_user_role.md)
-- [Sugerencias de Código](backend_suggestions_code.md)
-- [Requisitos Funcionales](backend_rf.md)
+- [Migraciones](backend_migrations.md) - Gestión de migraciones y versionado
 
 ---
 
