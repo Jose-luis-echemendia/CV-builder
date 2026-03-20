@@ -5,25 +5,82 @@ from fastapi.staticfiles import StaticFiles
 
 from starlette.middleware.cors import CORSMiddleware
 
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 # --- imports de la APP ---
 from app.admin import setup_admin
 from app.utils import custom_generate_unique_id
 from app.core.config import settings
 from app.api.v1.router import api_router as api_router_v1
-from app.services import RedisService, S3Service
 from app.middlewares import setup_middlewares
+from app.schemas import WelcomeResponse
+
+from app.core.cache import setup_cache, teardown_cache
+from app.core.config import settings
+from app.core.db import check_database, a_engine
+from app.core.logging import get_logger, setup_logging
+from app.core.s3 import minio_client
+
+log = get_logger(__name__)
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
+    
+# ─────────────────────────────────────────────────────────────────────────────
+# Lifespan — startup y shutdown de todos los servicios
+# ─────────────────────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # ── STARTUP ───────────────────────────────────────────────────────────────
+    setup_logging()
+    log.info("app.starting", env=settings.ENVIRONMENT, version=settings.APP_VERSION)
+
+    # 1. Base de datos
+    db_ok = await check_database()
+    if not db_ok:
+        raise RuntimeError("No se puede conectar a PostgreSQL. Abortando arranque.")
+    log.info("app.db.ready")
+
+    # 2. Caché Redis (fastapi-cache2 + CacheService)
+    await setup_cache()
+    log.info("app.cache.ready")
+
+    # 3. MinIO — verificar conexión y crear buckets si no existen
+    minio_ok = await minio_client.health_check()
+    if not minio_ok:
+        raise RuntimeError("No se puede conectar a MinIO. Abortando arranque.")
+    await minio_client.ensure_buckets()
+    log.info("app.minio.ready")
+
+    log.info("app.started")
+    yield
+
+    # ── SHUTDOWN ──────────────────────────────────────────────────────────────
+    log.info("app.stopping")
+
+    await teardown_cache()
+    log.info("app.cache.closed")
+
+    await a_engine.dispose()
+    log.info("app.db.closed")
+
+    log.info("app.stopped")    
+
 
 # ========================================================================
 #                 --- INSTANCIA DEL PROJECTO ---
 # ========================================================================
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
+    docs_url="/docs" if not settings.is_production else None,
+    redoc_url="/redoc" if not settings.is_production else None,
     generate_unique_id_function=custom_generate_unique_id,
+    lifespan=lifespan
 )
 
 
@@ -42,16 +99,6 @@ app.mount(
 setup_middlewares(app)
 
 
-# ========================================================================
-#           --- INICIALIZACIÓN DE SERVICIOS (CACHÉ Y STORAGES) ---
-# ========================================================================
-@app.on_event("startup")
-async def on_startup():
-    await RedisService.init_async()
-    RedisService.init_sync()
-    await S3Service.init_async()
-    S3Service.init_sync()
-
 
 # ========================================================================
 #                   --- MANEJADOR DE ERRORES ---
@@ -67,6 +114,12 @@ app.add_exception_handler(
 app.add_exception_handler(_exceptions.HTTPException, _exceptions.http_exception_handler)
 app.add_exception_handler(Exception, _exceptions.generic_exception_handler)
 
+
+# ========================================================================
+#                   --- CORS ---
+# ========================================================================
+
+
 # Set all CORS enabled origins
 if settings.all_cors_origins:
     app.add_middleware(
@@ -80,10 +133,35 @@ if settings.all_cors_origins:
 # ========================================================================
 #             --- MÉTODOS DE LA API ( ROUTERS ) ---
 # ========================================================================
-app.include_router(api_router_v1, prefix=settings.API_V1_STR)
+app.include_router(api_router_v1, prefix=settings.API_V1_PREFIX)
 
 
 # ========================================================================
 #             --- PANEL DE ADMINISTRACIÓN INICIALIZADO ---
 # ========================================================================
 setup_admin(app)
+
+
+@app.get("/", response_model=WelcomeResponse)
+def read_root():
+    """ """
+    return WelcomeResponse(
+        message=f"Welcome to {settings.APP_NAME}",
+        project=settings.APP_NAME,
+        version=settings.APP_VERSION,
+        environment=settings.ENVIRONMENT,
+    )
+    
+@app.get("/health", tags=["health"], include_in_schema=False)
+async def health() -> dict:
+    from app.core.cache import cache_service
+    return {
+        "status":   "ok",
+        "env":      settings.ENVIRONMENT,
+        "version":  settings.APP_VERSION,
+        "services": {
+            "database": await check_database(),
+            "cache":    await cache_service.ping(),
+            "minio":    await minio_client.health_check(),
+        },
+    }

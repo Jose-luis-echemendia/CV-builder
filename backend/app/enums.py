@@ -1,12 +1,7 @@
-from enum import Enum
+from enum import Enum, StrEnum
 
 
-class UserRole(str, Enum):
-    """
-    Enums para definir los roles del usuario
-    """
-
-    DEVELOPER = "developer"
-    ADMIN = "admin"
-    USER = "user"
-    
+class Environment(StrEnum):
+    DEVELOPMENT = "development"
+    STAGING     = "staging"
+    PRODUCTION  = "production"

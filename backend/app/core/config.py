@@ -310,13 +310,13 @@ class Settings(BaseSettings):
             "minioadminsecret",
         }
 
-        if isinstance(normalized, str) and normalized.lower() in insecure_defaults:
+        if isinstance(normalized, str) and normalized.lower() in insecure_defaults and not self.is_development:
             raise ValueError(
                 f"{var_name} no puede usar un valor por defecto/inseguro. "
                 "Debes cambiarlo en las variables de entorno."
             )
 
-        if self.ENVIRONMENT == Environment.DEVELOPMENT:
+        if self.is_development:
             warnings.warn(
                 f"{var_name} está configurado. Recuerda usar valores robustos para despliegues.",
                 stacklevel=1,
