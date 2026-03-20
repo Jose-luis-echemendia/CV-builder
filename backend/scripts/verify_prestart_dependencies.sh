@@ -109,18 +109,18 @@ echo ""
 check_dir "app" "Directorio de aplicación"
 check_dir "app/seed" "Directorio de seeders"
 check_dir "app/alembic" "Directorio de Alembic"
-check_dir "app/alembic/versions" "Directorio de migraciones"
+check_dir "app/alembic/migrations" "Directorio de migraciones"
 check_dir "docs" "Directorio de documentación backend" false
 check_dir "internal_docs" "Directorio de documentación interna" false
 echo ""
 
 echo -e "${BLUE}📋 PASO 6: Verificando migraciones de Alembic${NC}"
 echo ""
-MIGRATION_COUNT=$(find app/alembic/versions -name "*.py" ! -name "__*" 2>/dev/null | wc -l)
+MIGRATION_COUNT=$(find app/alembic/migrations -name "*.py" ! -name "__*" 2>/dev/null | wc -l)
 if [ "$MIGRATION_COUNT" -gt 0 ]; then
     echo -e "${GREEN}✅ Migraciones encontradas: $MIGRATION_COUNT${NC}"
-    echo -e "   📂 app/alembic/versions/"
-    find app/alembic/versions -name "*.py" ! -name "__*" -exec basename {} \; | head -5
+    echo -e "   📂 app/alembic/migrations/"
+    find app/alembic/migrations -name "*.py" ! -name "__*" -exec basename {} \; | head -5
     if [ "$MIGRATION_COUNT" -gt 5 ]; then
         echo -e "   ... y $((MIGRATION_COUNT - 5)) más"
     fi

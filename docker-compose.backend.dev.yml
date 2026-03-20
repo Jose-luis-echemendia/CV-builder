@@ -110,8 +110,6 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
       - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
@@ -162,6 +160,7 @@ services:
     volumes:
       - ./backend/app:/app/app
       - ./scripts:/app/scripts
+      - ./backend/scripts:/app/scripts
     env_file:
       - .env
     depends_on:
@@ -170,8 +169,6 @@ services:
     environment:
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
       - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
       - POSTGRES_HOST=db
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -204,6 +201,7 @@ services:
     volumes:
       - ./backend/app:/app/app
       - ./scripts:/app/scripts
+      - ./backend/scripts:/app/scripts
     depends_on:
       - redis
       - db

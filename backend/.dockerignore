@@ -62,7 +62,7 @@ docker-compose*.yml
 *.sqlite3
 
 # Alembic (keep alembic.ini)
-app/alembic/versions/__pycache__/
+app/alembic/migrations/__pycache__/
 
 # Temporary files
 tmp/

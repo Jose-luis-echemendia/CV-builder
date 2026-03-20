@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ════════════════════════════════════════════════════════════════════════════
-# Script de Despliegue Unificado - Feature Models Platform
+# Script de Despliegue Unificado
 # ════════════════════════════════════════════════════════════════════════════
 # 
 # Este script integra dos modos de despliegue:

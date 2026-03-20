@@ -1,6 +1,6 @@
 # 📜 Scripts de Despliegue y Utilidades
 
-Este directorio contiene scripts útiles para el despliegue y mantenimiento de la plataforma Feature Models.
+Este directorio contiene scripts útiles para el despliegue y mantenimiento de la plataforma.
 
 ---
 

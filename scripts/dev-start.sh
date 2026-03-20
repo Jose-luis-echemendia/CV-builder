@@ -15,7 +15,7 @@ NC='\033[0m'
 
 echo ""
 echo "======================================================================"
-echo -e "${CYAN}  🚀 INICIO RÁPIDO - Entorno de Desarrollo Feature Models${NC}"
+echo -e "${CYAN}  🚀 INICIO RÁPIDO - Entorno de Desarrollo${NC}"
 echo "======================================================================"
 echo ""
 

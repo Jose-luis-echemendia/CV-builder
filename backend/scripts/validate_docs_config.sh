@@ -93,7 +93,7 @@ echo "👤 Verificando rol DEVELOPER..."
 grep -q 'DEVELOPER = "DEVELOPER"' app/enums.py
 check "Enum DEVELOPER definido en mayúsculas"
 
-ls app/alembic/versions/*_add_developer_role_to_userrole_enum.py >/dev/null 2>&1
+ls app/alembic/migrations/*_add_developer_role_to_userrole_enum.py >/dev/null 2>&1
 check "Migración de DEVELOPER existe"
 
 # Resumen

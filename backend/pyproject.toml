@@ -35,7 +35,7 @@ dependencies = [
    
     # --- Celery + Redis ---
     "celery[redis]>=5.4.0",
-    "redis>=5.0.0",
+    "redis>=4.6.0,<5.0.0",
     "aioredis>=2.0.0",
 
     # --- Object storage ---
