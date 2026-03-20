@@ -59,11 +59,9 @@ nav:
       - Arquitectura: backend_architecture.md
       - Documentación Técnica:
           - Servicio Prestart: backend_PRESTART_SERVICE.md
-          - Arquitectura S3: backend_s3_architecture.md
-          - Login Endpoints : backend_LOGIN_ENDPOINTS.md
-          - User Endpoints : backend_USER_ENDPOINTS.md
-          - Orden de Migraciones: backend_MIGRATION_ORDER_FIX.md
-          - Roles de Usuario: backend_user_role.md
+          # - Login Endpoints : backend_LOGIN_ENDPOINTS.md
+          # - User Endpoints : backend_USER_ENDPOINTS.md
+          - Migraciones: backend_migrations.md
           
   - 🎨 Frontend:
       - Índice: frontend_README.md
