@@ -16,7 +16,7 @@ Bienvenido a la documentación técnica completa del proyecto **Feature Model**.
 
 Documentación general del proyecto, arquitectura global y configuración de despliegue.
 
-[:octicons-arrow-right-24: **Explorar Documentación del Proyecto**](root_index.md){ .md-button .md-button--primary }
+[:octicons-arrow-right-24: **Explorar Documentación del Proyecto**](README.md){ .md-button .md-button--primary }
 
 ---
 
@@ -24,7 +24,7 @@ Documentación general del proyecto, arquitectura global y configuración de des
 
 API, modelos de datos, servicios, migraciones y documentación técnica del backend.
 
-[:octicons-arrow-right-24: **Explorar Documentación del Backend**](backend_commands.md){ .md-button .md-button--primary }
+[:octicons-arrow-right-24: **Explorar Documentación del Backend**](../backend/README.md){ .md-button .md-button--primary }
 
 ---
 
@@ -48,14 +48,13 @@ Documentación de nivel superior que abarca:
 
 **Archivos principales:**
 
-- [Índice del Proyecto](root_index.md)
-- [README](root_README.md)
-- [Requisitos](root_requirements.md)
-- [Arquitectura - Estructura de Carpetas](root_1_architecture_folder_structure.md)
-- [Arquitectura - Base de Datos](root_1_architecture_db.md)
-- [Arquitectura - Despliegue](root_1_architecture_DEPLOYMENT_ARCHITECTURE.md)
-- [Configuración - Desarrollo](root_2_configuration_development.md)
-- [Configuración - Despliegue](root_2_configuration_deployment.md)
+- [README](README.md)
+- [Requisitos](requirements.md)
+- [Arquitectura - Estructura de Carpetas](1_architecture/folder_structure.md)
+- [Arquitectura - Base de Datos](1_architecture/db.md)
+- [Arquitectura - Despliegue](1_architecture/DEPLOYMENT_ARCHITECTURE.md)
+- [Configuración - Desarrollo](2_configuration/development.md)
+- [Configuración - Despliegue](2_configuration/deployment.md)
 
 ---
 
@@ -65,9 +64,11 @@ Documentación técnica del backend (FastAPI + PostgreSQL):
 
 **Core:**
 
-- [Comandos](backend_commands.md) - Comandos útiles de desarrollo
-- [Base de Datos](backend_db.md) - Esquema y migraciones
-- [Migraciones](backend_migrations.md) - Gestión de migraciones y versionado
+- [README Backend](../backend/README.md) - Introducción y setup
+- [Comandos](../backend/docs/commands.md) - Comandos útiles de desarrollo
+- [Base de Datos](../backend/docs/db.md) - Esquema y migraciones
+
+- [Migraciones](../backend/docs/migrations.md) - Gestión de migraciones y versionado
 
 ---
 
