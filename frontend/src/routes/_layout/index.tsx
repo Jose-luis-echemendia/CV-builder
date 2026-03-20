@@ -1,16 +1,13 @@
-import { lazy } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-
-const DashboardPage = lazy(() => import("@/pages/dashboard"));
-
-export const Route = createFileRoute("/_layout/")({
-  component: Dashboard,
+import { createFileRoute } from '@tanstack/react-router';
+import {Hero} from '@/components/Common/Hero';
+export const Route = createFileRoute('/_layout/')({
+  component: Home,
 });
 
-function Dashboard() {
+function Home() {
   return (
-    <>
-      <DashboardPage />
-    </>
+    <div>
+      <Hero/>
+    </div>
   );
 }
