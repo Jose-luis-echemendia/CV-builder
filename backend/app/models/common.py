@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 from typing import Generic, TypeVar, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field as PydanticField
 from sqlmodel import Field, SQLModel
 
 
@@ -99,38 +99,14 @@ class BaseTable(SQLModel):
     deleted_at: Optional[datetime] = Field(default=None)
     is_active: bool = Field(default=True, index=True)  # is_deleted
 
-    # Campos de auditoría de usuario
-    created_by_id: Optional[uuid.UUID] = Field(default=None, foreign_key="users.id")
-    updated_by_id: Optional[uuid.UUID] = Field(default=None, foreign_key="users.id")
-    deleted_by_id: Optional[uuid.UUID] = Field(default=None, foreign_key="users.id")
+    # Campos de auditoría genéricos (sin dependencia de tabla de usuarios)
+    created_by_id: Optional[uuid.UUID] = Field(default=None)
+    updated_by_id: Optional[uuid.UUID] = Field(default=None)
+    deleted_by_id: Optional[uuid.UUID] = Field(default=None)
 
 
 class Message(BaseModel):
     message: str
-
-
-# ========================================================================
-#           --- Modelos para Autenticación y Tokens ---
-# ========================================================================
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-class TokenPayload(BaseModel):
-    sub: Optional[uuid.UUID] = None
-
-
-class NewPassword(BaseModel):
-    token: str
-    new_password: str
-
-
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
 
 
 # Usamos TypeVar para crear un tipo genérico que pueda contener cualquier dato
@@ -165,7 +141,7 @@ class ErrorResponse(BaseModel):
 # ========================================================================
 
 
-# Este es un modelo genérico. `data` puede ser un User, una lista de Products, etc.
+# Este es un modelo genérico. `data` puede ser cualquier tipo de payload.
 class SuccessResponse(BaseModel, Generic[DataType]):
     object: str
     code: int = 200
@@ -188,8 +164,4 @@ class EnumValue(BaseModel):
 class AllEnumsResponse(BaseModel):
     """Modelo de respuesta que contiene todas las listas de enums."""
 
-    userRoles: list[EnumValue]
-    productCategories: list[EnumValue]
-    orderStatuses: list[EnumValue]
-    pizzaBakingOptions: list[EnumValue]
-    genericSizes: list[EnumValue]
+    options: dict[str, list[EnumValue]] = PydanticField(default_factory=dict)

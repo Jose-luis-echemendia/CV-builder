@@ -2,7 +2,7 @@
 Excepciones de la aplicación.
 
 Este módulo centraliza todas las excepciones personalizadas de la aplicación,
-tanto las genéricas como las específicas del dominio de Feature Models.
+tanto las genéricas como las específicas del dominio de.
 """
 
 from fastapi.exceptions import RequestValidationError
@@ -20,15 +20,6 @@ from .exceptions import (
     generic_exception_handler,
 )
 
-from .users import (
-    UserException,
-    UserNotFound,
-    UserAlreadyExists,
-    InvalidPassword,
-    PermissionDenied,
-    UserInactive,
-    UserActive,
-)
 
 __all__ = [
     # FastAPI exceptions
@@ -45,12 +36,4 @@ __all__ = [
     "ConflictException",
     "ForbiddenException",
     "UnauthorizedException",
-    # User exceptions
-    "UserException",
-    "UserNotFound",
-    "UserAlreadyExists",
-    "InvalidPassword",
-    "PermissionDenied",
-    "UserInactive",
-    "UserActive",
 ]
