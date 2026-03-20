@@ -5,12 +5,10 @@ from fastapi_cache.decorator import cache
 
 from pydantic.networks import EmailStr
 
-from app import enums
-from app.models import Message, AllEnumsResponse
-from app.services import format_enum_for_frontend, SettingsService
+from app.models import Message
+from app.services import SettingsService
 from app.api.deps import get_settings_service
 from app.core.config import settings
-from app.api.deps import get_current_active_superuser
 from app.utils import generate_test_email, send_email
 
 router = APIRouter(prefix="/utils", tags=["utils"])
@@ -21,19 +19,11 @@ router = APIRouter(prefix="/utils", tags=["utils"])
 # ===========================================================================
 
 
-# ===========================================================================
-#               --- Endpoint raíz de bienvenida. ---
-# ===========================================================================
-
-@router.get("")
-def read_root():
-    """ """
-    return {"message": f"Welcome to {settings.PROJECT_NAME}"}
-
 
 # ===========================================================================
 #               --- Endpoint Health Check ---
 # ===========================================================================
+
 
 @router.get("/health-check")
 async def health_check() -> bool:
@@ -56,43 +46,19 @@ async def get_docs_access_info():
 
     return {
         "message": "Acceso a Documentación Interna",
-        "authentication_required": True,
-        "required_role": "developer",
+        "authentication_required": False,
         "steps": [
             {
                 "step": 1,
-                "description": "Obtener token de acceso",
-                "endpoint": "/api/v1/login/access-token",
-                "method": "POST",
-                "body": {"username": "tu_email@example.com", "password": "tu_password"},
-                "response_example": {
-                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                    "token_type": "bearer",
-                },
-            },
-            {
-                "step": 2,
-                "description": "Acceder a la documentación con el token",
-                "options": [
-                    {
-                        "method": "Query Parameter (navegador)",
-                        "url": f"{base_url}/internal-docs/?token=<tu_access_token>",
-                        "recommended": True,
-                    },
-                    {
-                        "method": "Authorization Header (API)",
-                        "url": f"{base_url}/internal-docs/",
-                        "header": "Authorization: Bearer <tu_access_token>",
-                    },
-                ],
-            },
+                "description": "Abrir la documentación interna",
+                "url": f"{base_url}/internal-docs/",
+                "method": "GET",
+            }
         ],
         "notes": [
-            "Solo usuarios con rol 'developer' pueden acceder",
-            "El token expira según la configuración del sistema",
-            "Si el token expira, deberás iniciar sesión nuevamente",
+            "La documentación interna está disponible sin autenticación de usuario",
         ],
-        "quick_access_example": f"{base_url}/internal-docs/?token=YOUR_TOKEN_HERE",
+        "quick_access_example": f"{base_url}/internal-docs/",
     }
 
 
@@ -111,14 +77,13 @@ async def get_internal_error():
     return {"message": "Esto nunca se verá"}
 
 
+# ===========================================================================
+#       --- Endpoint para probar el envío de correos electrónicos. ---
+# ===========================================================================
 
-# ===========================================================================
-#       --- Endpoint para probar el envío de correos electrónicos. --- 
-# ===========================================================================
 
 @router.post(
     "/test-email",
-    dependencies=[Depends(get_current_active_superuser)],
     status_code=201,
 )
 def test_email(email_to: EmailStr) -> Message:
@@ -134,74 +99,35 @@ def test_email(email_to: EmailStr) -> Message:
     return Message(message="Test email sent")
 
 
-
 # ================================================================================
 #  --- Endpoint para probar el servicio de variables dinámicas del sistema. ---
 # ================================================================================
 
+
 @router.get("/test/setting")
 async def get_example_with_dynamic_setting(
-    settings_service: SettingsService = Depends(get_settings_service)
+    settings_service: SettingsService = Depends(get_settings_service),
 ):
     """
-        Endpoint para probar el servicio de variables dinámicas configurables.
-        Usamos el servicio para obtener un ajuste dinámico
+    Endpoint para probar el servicio de variables dinámicas configurables.
+    Usamos el servicio para obtener un ajuste dinámico
     """
-    
+
     items_per_page = await settings_service.aget("ITEMS_PER_PAGE", default=25)
     maintenance_mode = await settings_service.aget("MAINTENANCE_MODE", default=False)
-    
+
     if maintenance_mode:
         return {"message": "El sistema está en modo mantenimiento."}
 
     return {"message": f"Mostrando {items_per_page} items por página."}
 
 
-
-# ===========================================================================
-#          --- Endpoint para obtener los roles del sistema. ---
-# ===========================================================================
-@router.get(
-    "/roles",
-    dependencies=[Depends(get_current_active_superuser)],
-    response_model=list[str],
-)
-def get_roles() -> list[str]:
-    """
-    Retrieve the roles of the system.
-    """
-    from app.enums import UserRole 
-    return [role.value for role in UserRole]
-
-
-# ===========================================================================
-#           --- Endpoint para obtener los enums del sistema ---
-# ===========================================================================
-    
-@router.get(
-    "/options",
-    response_model=AllEnumsResponse,
-    summary="Obtener todas las opciones (enums) para los selectores del frontend"
-)
-@cache(expire=86400)
-def read_enums():
-    """
-    Proporciona una lista consolidada de todos los valores de enumeración
-    utilizados en la aplicación.
-
-    Esto es útil para poblar dinámicamente los menús desplegables,
-    filtros y otros componentes en el frontend sin tener que codificar
-    estos valores.
-    """
-    return {
-        "userRoles": format_enum_for_frontend(enums.UserRole),
-    }
-
 # ===========================================================================
 #           --- Endpoint para limpiar la CACHÉ del sistema ---
 # ===========================================================================
-     
-@router.post("/clear-cache", dependencies=[Depends(get_current_active_superuser)])
+
+
+@router.post("/clear-cache")
 async def clear_cache():
     """
     Limpia toda la caché de la aplicación.
@@ -241,4 +167,3 @@ async def clear_cache():
 
     except Exception as e:
         return {"detail": f"Error clearing cache: {str(e)}", "keys_deleted": 0}
-
