@@ -1,5 +1,5 @@
 """
 Inicialización del submódulo core.
 
-Contiene utilidades y funciones centrales para la configuración, generación de tokens, emails y caché.
+Contiene utilidades y funciones centrales para configuración, seguridad, emails y caché.
 """
