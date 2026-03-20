@@ -20,7 +20,7 @@ BEAT_SCHEDULE: dict = {
     # como DRAFT para que el usuario sepa que debe regenerarlo.
     # Se ejecuta cada hora.
     "cleanup-expired-pdfs": {
-        "task": "app.tasks.cleanup_tasks.cleanup_expired_pdfs",
+        "task": "app.tasks.cleanup.cleanup_expired_pdfs",
         "schedule": crontab(minute=0),  # cada hora en punto
         "options": {
             "queue": "maintenance",
@@ -32,7 +32,7 @@ BEAT_SCHEDULE: dict = {
     # BUILDING para siempre. Esta tarea detecta CVs en BUILDING durante
     # más de 10 minutos y los marca como ERROR con mensaje explicativo.
     "cleanup-stale-building-cvs": {
-        "task": "app.tasks.cleanup_tasks.cleanup_stale_building_cvs",
+        "task": "app.tasks.cleanup.cleanup_stale_building_cvs",
         "schedule": crontab(minute="*/10"),  # cada 10 minutos
         "options": {
             "queue": "maintenance",

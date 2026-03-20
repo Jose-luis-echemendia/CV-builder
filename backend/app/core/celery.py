@@ -37,8 +37,8 @@ celery_app = Celery(
     broker=settings.REDIS_URL_BROKER,
     backend=settings.REDIS_URL_BACKEND,
     include=[
-        "app.tasks.pdf_tasks",
-        "app.tasks.cleanup_tasks",
+        "app.tasks.pdf",
+        "app.tasks.cleanup",
     ],
 )
 
@@ -80,16 +80,16 @@ celery_app.conf.update(
     # ── Routing de tareas por nombre ──────────────────────────────────────────
     task_routes={
         # Generación de PDFs → cola dedicada con más tiempo
-        "app.tasks.pdf_tasks.generate_cv_pdf": {
+        "app.tasks.pdf.generate_cv_pdf": {
             "queue": "pdf",
             "routing_key": "pdf",
         },
         # Mantenimiento periódico → baja prioridad
-        "app.tasks.cleanup_tasks.cleanup_expired_pdfs": {
+        "app.tasks.cleanup.cleanup_expired_pdfs": {
             "queue": "maintenance",
             "routing_key": "maintenance",
         },
-        "app.tasks.cleanup_tasks.cleanup_stale_building_cvs": {
+        "app.tasks.cleanup.cleanup_stale_building_cvs": {
             "queue": "maintenance",
             "routing_key": "maintenance",
         },
@@ -117,7 +117,7 @@ celery_app.conf.update(
 )
 
 # ── Importar el schedule aquí para evitar importaciones circulares ────────────
-from app.tasks.beat_schedule import BEAT_SCHEDULE  # noqa: E402
+from app.core.beat_schedule import BEAT_SCHEDULE  # noqa: E402
 
 celery_app.conf.beat_schedule = BEAT_SCHEDULE
 

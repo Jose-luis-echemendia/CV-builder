@@ -173,6 +173,7 @@ services:
       - db
       - redis
     environment:
+      - REDIS_HOST=redis
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
       - SECRET_KEY=${SECRET_KEY?Variable not set}
       - POSTGRES_HOST=db
