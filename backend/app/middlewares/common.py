@@ -1,223 +1,14 @@
 import logging
 
 from fastapi import Request
-from fastapi.responses import JSONResponse
-
-import jwt
-from jwt.exceptions import InvalidTokenError
-
-from app.core.config import settings
-from app.core.security import ALGORITHM
-from app.enums import UserRole
 from app.services import RedisService
 from app.utils import invalidate_cache_pattern
 
 # Configurar logger para este módulo
 logger = logging.getLogger(__name__)
 
-
-async def protect_internal_docs_middleware(request: Request, call_next):
-    """
-    Middleware para proteger la documentación interna.
-
-    En desarrollo: Acceso público sin autenticación
-    En producción: Solo usuarios con rol DEVELOPER pueden acceder a /internal-docs/
-
-    Valida el token JWT y verifica el rol del usuario en producción.
-
-    Soporta tres métodos de autenticación:
-    1. Header Authorization: Bearer <token>
-    2. Query parameter: ?token=<token> (para acceso inicial desde navegador)
-    3. Cookie: internal_docs_token (se establece automáticamente después del primer acceso)
-
-    Cuando se accede con ?token=, el middleware guarda el token en una cookie
-    para que las navegaciones subsecuentes dentro de /internal-docs/ no requieran
-    el parámetro en la URL.
-
-    Los archivos estáticos (CSS, JS, imágenes, etc.) pasan sin validación
-    para permitir que la documentación se muestre correctamente.
-
-    Args:
-        request: Request HTTP entrante
-        call_next: Siguiente middleware/handler en la cadena
-
-    Returns:
-        Response del siguiente handler o JSONResponse con error
-    """
-    path = request.url.path
-
-    # Protege todo lo que empiece con /internal-docs
-    if path.startswith("/internal-docs"):
-        # 🆓 En desarrollo/local, permitir acceso público sin autenticación
-        if settings.ENVIRONMENT in ("development", "local"):
-            logger.debug(
-                f"📖 Acceso público a documentación interna ({settings.ENVIRONMENT}): {path}"
-            )
-            return await call_next(request)
-
-        # 🔒 En producción, validar autenticación
-        # Permitir archivos estáticos sin autenticación (CSS, JS, imágenes, fuentes, etc.)
-        static_extensions = (
-            ".css",
-            ".js",
-            ".png",
-            ".jpg",
-            ".jpeg",
-            ".gif",
-            ".svg",
-            ".ico",
-            ".woff",
-            ".woff2",
-            ".ttf",
-            ".eot",
-            ".map",
-            ".webp",
-            ".webmanifest",
-        )
-
-        if path.endswith(static_extensions):
-            # Los archivos estáticos pasan sin validación
-            return await call_next(request)
-
-        # Para archivos HTML y el resto, validar autenticación
-        # Obtener token de múltiples fuentes (header, query param, cookie)
-        auth_header = request.headers.get("Authorization")
-        query_token = request.query_params.get("token")
-        cookie_token = request.cookies.get("internal_docs_token")
-
-        # Prioridad: header Authorization > query param > cookie
-        token = None
-        token_from_query = False
-
-        if auth_header:
-            try:
-                # Validar formato del header
-                parts = auth_header.split()
-                if len(parts) == 2 and parts[0].lower() == "bearer":
-                    token = parts[1]
-            except Exception:
-                pass
-        elif query_token:
-            token = query_token
-            token_from_query = True  # Marcar que el token vino del query param
-        elif cookie_token:
-            token = cookie_token
-
-        if not token:
-            logger.warning(
-                f"🔒 Intento de acceso sin token a documentación interna: {path}"
-            )
-            return JSONResponse(
-                status_code=401,
-                content={
-                    "detail": "No autenticado. Se requiere token de acceso.",
-                    "message": "Debes iniciar sesión para acceder a la documentación interna.",
-                    "help": "Puedes autenticarte de tres formas:",
-                    "methods": [
-                        "1. Header: Authorization: Bearer <token>",
-                        "2. Query param: ?token=<token> (recomendado para navegador)",
-                        "3. Cookie: Se establece automáticamente al usar ?token=",
-                    ],
-                },
-            )
-
-        try:
-            # Decodificar y validar el token JWT
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-
-            # Extraer el rol del usuario del payload
-            user_role = payload.get("role")
-
-            if not user_role:
-                logger.warning(f"🔒 Token sin rol detectado al acceder a: {path}")
-                return JSONResponse(
-                    status_code=403,
-                    content={
-                        "detail": "Token inválido: rol no encontrado",
-                        "message": "El token no contiene información de rol",
-                    },
-                )
-
-            # Verificar que el rol sea DEVELOPER
-            if user_role != UserRole.DEVELOPER.value:
-                logger.warning(
-                    f"🔒 Acceso denegado a documentación interna. Rol '{user_role}' intentó acceder a: {path}"
-                )
-                return JSONResponse(
-                    status_code=403,
-                    content={
-                        "detail": "Acceso denegado: se requiere rol de desarrollador",
-                        "message": f"Tu rol actual ({user_role}) no tiene acceso a la documentación interna. Solo usuarios con rol 'developer' pueden acceder.",
-                        "required_role": UserRole.DEVELOPER.value,
-                        "current_role": user_role,
-                    },
-                )
-
-            # Acceso exitoso
-            logger.info(
-                f"✅ Acceso concedido a documentación interna: {path} (rol: {user_role})"
-            )
-
-            # Procesar la petición
-            response = await call_next(request)
-
-            # Si el token vino del query param, establecer cookie para futuras peticiones
-            if token_from_query:
-                # Establecer cookie con el token para que persista en navegaciones
-                response.set_cookie(
-                    key="internal_docs_token",
-                    value=token,
-                    max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-                    * 60,  # Convertir minutos a segundos
-                    httponly=True,  # No accesible desde JavaScript (seguridad)
-                    secure=settings.ENVIRONMENT
-                    == "production",  # Solo HTTPS en producción
-                    samesite="lax",  # Protección CSRF
-                    path="/internal-docs",  # Solo para rutas de documentación
-                )
-                logger.info(
-                    f"🍪 Cookie de autenticación establecida para documentación interna"
-                )
-
-            return response
-
-        except InvalidTokenError as e:
-            logger.warning(
-                f"🔒 Token inválido o expirado al acceder a: {path} - {str(e)}"
-            )
-            return JSONResponse(
-                status_code=401,
-                content={
-                    "detail": "Token inválido o expirado",
-                    "message": "El token de autenticación no es válido o ha expirado. Por favor, inicia sesión nuevamente.",
-                    "error": str(e),
-                },
-            )
-        except ValueError as e:
-            logger.error(f"⚠️  Error de formato en autenticación: {path} - {str(e)}")
-            return JSONResponse(
-                status_code=401,
-                content={
-                    "detail": "Error en formato de autenticación",
-                    "message": str(e),
-                },
-            )
-        except Exception as e:
-            logger.error(
-                f"⚠️  Error interno al validar autenticación: {path} - {str(e)}",
-                exc_info=True,
-            )
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "detail": "Error interno del servidor",
-                    "message": "Ocurrió un error al validar la autenticación",
-                    "error": str(e),
-                },
-            )
-
-    # Si pasa la validación o no es ruta protegida, continúa normalmente
-    return await call_next(request)
+# Tamaño máximo de payload en bytes (10MB por defecto)
+MAX_PAYLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 async def invalidate_cache_on_write_middleware(request: Request, call_next):
@@ -228,7 +19,7 @@ async def invalidate_cache_on_write_middleware(request: Request, call_next):
     sobre ciertos recursos, se invalida el caché relacionado automáticamente.
 
     Recursos monitoreados (todos los del sistema):
-    - /users/: Invalida caché de usuarios
+    - /app-settings/: Invalida caché de configuraciones
 
     La invalidación se hace de forma asíncrona usando SCAN (no bloquea Redis)
     y solo se elimina las claves que coincidan con el patrón específico.
@@ -247,8 +38,6 @@ async def invalidate_cache_on_write_middleware(request: Request, call_next):
         # Diccionario de rutas y sus patrones de caché relacionados
         # Cada entrada puede tener múltiples patrones para invalidar caché relacionado
         cache_invalidation_map = {
-            # Usuarios
-            "/users": ["fastapi-cache:*users*"],
             # App Settings
             "/app-settings": [
                 "fastapi-cache:*app-settings*",

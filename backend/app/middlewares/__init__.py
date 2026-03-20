@@ -5,7 +5,6 @@ Este módulo contiene todos los middlewares HTTP personalizados que se aplican
 a la aplicación FastAPI para agregar funcionalidad transversal.
 
 Middlewares disponibles:
-    - protect_internal_docs: Protege la documentación interna con JWT
     - invalidate_cache_on_write: Invalida caché automáticamente en operaciones de escritura
 
 Uso:
@@ -19,7 +18,6 @@ import logging
 
 from fastapi import FastAPI
 from .common import (
-    protect_internal_docs_middleware,
     invalidate_cache_on_write_middleware,
 )
 
@@ -36,7 +34,6 @@ def setup_middlewares(app: FastAPI) -> None:
 
     Middlewares registrados (en orden de ejecución):
     1. invalidate_cache_on_write_middleware: Invalida caché en escrituras
-    2. protect_internal_docs_middleware: Protege documentación interna
 
     Args:
         app: Instancia de FastAPI
@@ -53,9 +50,5 @@ def setup_middlewares(app: FastAPI) -> None:
     # Registrar middleware de invalidación de caché (primero para que se ejecute después)
     app.middleware("http")(invalidate_cache_on_write_middleware)
 
-    # Registrar middleware de protección de documentación interna
-    app.middleware("http")(protect_internal_docs_middleware)
-
     logger.info("✅ Middlewares configurados correctamente")
     logger.info("  - 🔄 Cache invalidation middleware (POST/PUT/PATCH/DELETE)")
-    logger.info("  - 🔒 Internal docs protection middleware (/internal-docs)")
