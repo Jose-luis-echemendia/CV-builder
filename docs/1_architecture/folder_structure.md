@@ -1,114 +1,150 @@
-cv-generator/
-│
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── dependencies.py            # get_db, get_user_id (lee X-User-Id header)
-│   │
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py              # Settings: DB_URL, REDIS_URL, MINIO_*, SECRET_KEY
-│   │   ├── security.py            # ← tu módulo (require_api_key / require_admin_key)
-│   │   ├── database.py            # SQLAlchemy async engine + AsyncSession
-│   │   ├── redis.py               # Redis client (aioredis)
-│   │   ├── minio.py               # MinIO client + upload/presign helpers
-│   │   └── exceptions.py          # CVNotFound, TemplateNotFound, PDFGenerationError…
-│   │
-│   ├── models/                    # SQLAlchemy ORM — solo dominio CV
-│   │   ├── __init__.py
-│   │   ├── base.py                # DeclarativeBase + TimestampMixin (created_at/updated_at)
-│   │   ├── personal_info.py       # PersonalInfo  (1-1 con user_id externo)
-│   │   ├── project.py             # Project
-│   │   ├── project_section.py     # ProjectSection  (descripción + tag)
-│   │   ├── skill.py               # Skill + SkillCategory
-│   │   ├── cv_template.py         # CVTemplate  (nombre, preview_url, ruta jinja2)
-│   │   ├── cv.py                  # CV  (cabecera: título, job_target, estado…)
-│   │   └── cv_composition.py      # CVProject · CVSection · CVSkill  (selección)
-│   │
-│   ├── schemas/                   # Pydantic v2
-│   │   ├── __init__.py
-│   │   ├── common.py              # Pagination, MessageResponse, UUIDModel
-│   │   ├── personal_info.py
-│   │   ├── project.py
-│   │   ├── project_section.py
-│   │   ├── skill.py
-│   │   ├── cv_template.py
-│   │   └── cv.py                  # CVCreate · CVRead · CVBuildRequest · CVStatusRead
-│   │
-│   ├── repositories/
-│   │   ├── __init__.py
-│   │   ├── base.py                # BaseRepository[Model] — CRUD genérico async
-│   │   ├── personal_info_repo.py
-│   │   ├── project_repo.py
-│   │   ├── skill_repo.py
-│   │   ├── cv_template_repo.py
-│   │   └── cv_repo.py
-│   │
-│   ├── services/
-│   │   ├── __init__.py
-│   │   ├── personal_info_service.py
-│   │   ├── project_service.py
-│   │   ├── skill_service.py
-│   │   ├── cv_template_service.py
-│   │   ├── cv_service.py          # ensambla datos → dispara tarea Celery
-│   │   └── pdf_service.py         # Jinja2 render → WeasyPrint → MinIO upload
-│   │
-│   ├── api/
-│   │   └── v1/
-│   │       ├── __init__.py
-│   │       ├── router.py          # agrega todos los sub-routers
-│   │       ├── personal_info.py   # GET/PUT  /me/personal-info
-│   │       ├── projects.py        # CRUD     /projects  +  /projects/{id}/sections
-│   │       ├── skills.py          # CRUD     /skills    +  /skills/categories
-│   │       ├── cv_templates.py    # GET      /templates  (admin: POST/DELETE)
-│   │       └── cvs.py             # CRUD     /cvs
-│   │                              # POST     /cvs/{id}/build
-│   │                              # GET      /cvs/{id}/status
-│   │                              # GET      /cvs/{id}/download  (presigned URL)
-│   │
-│   └── workers/
-│       ├── __init__.py
-│       ├── celery_app.py          # Celery instance + config
-│       ├── beat_schedule.py       # cleanup_expired_pdfs cada 24 h
-│       └── tasks/
-│           ├── __init__.py
-│           ├── pdf_tasks.py       # @shared_task generate_cv_pdf(cv_id, user_id)
-│           └── cleanup_tasks.py   # elimina PDFs expirados de MinIO + marca CV
-│
-├── cv_templates/                  # Plantillas Jinja2 para generación PDF
-│   ├── modern/
-│   │   ├── template.html.j2
-│   │   └── style.css
-│   ├── classic/
-│   │   ├── template.html.j2
-│   │   └── style.css
-│   └── minimal/
-│       ├── template.html.j2
-│       └── style.css
-│
-├── migrations/
-│   ├── env.py
-│   ├── script.py.mako
-│   └── versions/
-│
-├── tests/
-│   ├── conftest.py                # fixtures: async client, test DB, fake user_id header
-│   ├── factories/
-│   │   ├── project_factory.py
-│   │   ├── skill_factory.py
-│   │   └── cv_factory.py
-│   └── test_api/
-│       ├── test_personal_info.py
-│       ├── test_projects.py
-│       ├── test_skills.py
-│       ├── test_cvs.py
-│       └── test_pdf_generation.py
-│
-├── docker/
-│   ├── Dockerfile                 # API
-│   └── Dockerfile.worker          # Celery worker + beat
-│
-├── docker-compose.yml
-├── pyproject.toml
+/home/jose/Escritorio/Work/CV-builder/backend
 ├── alembic.ini
-└── .env.example
+├── app
+│   ├── admin.py
+│   ├── alembic
+│   │   ├── env.py
+│   │   ├── migrations
+│   │   │   └── 6bec4302ec7e_25_12_27_init_db.py
+│   │   ├── README
+│   │   └── script.py.mako
+│   ├── api
+│   │   ├── deps.py
+│   │   └── v1
+│   │       ├── router.py
+│   │       └── routes
+│   │           ├── cvs.py
+│   │           ├── cv_templates.py
+│   │           ├── health.py
+│   │           ├── personal_info.py
+│   │           ├── projects.py
+│   │           ├── skills.py
+│   │           └── utils.py
+│   ├── backend_pre_start.py
+│   ├── core
+│   │   ├── beat_schedule.py
+│   │   ├── cache.py
+│   │   ├── celery.py
+│   │   ├── config.py
+│   │   ├── db.py
+│   │   ├── logging.py
+│   │   ├── redis.py
+│   │   ├── s3.py
+│   │   └── security.py
+│   ├── custom_types
+│   ├── enums.py
+│   ├── exceptions
+│   │   └── exceptions.py
+│   ├── feature_flags.py
+│   ├── logs.py
+│   ├── main.py
+│   ├── middlewares
+│   │   ├── common.py
+│   │   └── rate_limit.py
+│   ├── models
+│   │   ├── app_setting.py
+│   │   ├── common.py
+│   │   ├── cv_composition.py
+│   │   ├── cv.py
+│   │   ├── cv_template.py
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── project_section.py
+│   │   └── skill.py
+│   ├── repositories
+│   │   ├── base.py
+│   │   ├── cv_composition.py
+│   │   ├── cv.py
+│   │   ├── cv_template.py
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── project_section.py
+│   │   └── skill.py
+│   ├── schemas
+│   │   ├── cv_composition.py
+│   │   ├── cv.py
+│   │   ├── cv_template.py
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── project_section.py
+│   │   ├── skill.py
+│   │   └── utils.py
+│   ├── seed
+│   │   ├── data_settings.py
+│   │   ├── main.py
+│   │   ├── README.md
+│   │   └── seeders.py
+│   ├── seed_data.py
+│   ├── services
+│   │   ├── common.py
+│   │   ├── cv.py
+│   │   ├── cv_template.py
+│   │   ├── pdf.py
+│   │   ├── personal_info.py
+│   │   ├── project.py
+│   │   ├── settings.py
+│   │   └── skill.py
+│   ├── sync_docs.py
+│   ├── tasks
+│   │   ├── cleanup.py
+│   │   ├── maintenance.py
+│   │   └── pdf.py
+│   ├── templates
+│   │   ├── cv
+│   │   │   ├── classic
+│   │   │   ├── minimal
+│   │   │   └── modern
+│   │   └── email
+│   │       ├── build
+│   │       │   ├── new_account.html
+│   │       │   ├── reset_password.html
+│   │       │   └── test_email.html
+│   │       └── src
+│   │           ├── new_account.mjml
+│   │           ├── reset_password.mjml
+│   │           └── test_email.mjml
+│   ├── tests_pre_start.py
+│   └── utils
+│       ├── cache.py
+│       ├── email.py
+│       └── generators.py
+├── backend_tree.txt
+├── docker
+│   ├── Dockerfile
+│   └── Dockerfile.dev
+├── docs
+│   ├── commands.md
+│   ├── db.md
+│   └── migrations.md
+├── poetry.lock
+├── pyproject.toml
+├── README.md
+├── scripts
+│   ├── format.sh
+│   ├── lint.sh
+│   ├── make_bucket_public.py
+│   ├── prestart.sh
+│   ├── start-celery-beat.sh
+│   ├── start-celery-worker.sh
+│   ├── test.sh
+│   ├── tests-start.sh
+│   ├── test_statistics_endpoints.sh
+│   ├── validate_docs_config.sh
+│   ├── verify_migration_order.sh
+│   └── verify_prestart_dependencies.sh
+├── tests
+│   ├── api
+│   │   └── routes
+│   ├── conftest.py
+│   ├── crud
+│   ├── scripts
+│   │   ├── test_backend_pre_start.py
+│   │   └── test_test_pre_start.py
+│   ├── services
+│   │   ├── test_common.py
+│   │   └── test_settings_service.py
+│   └── utils
+│       └── utils.py
+└── uv.lock
+
+36 directories, 112 files
