@@ -81,11 +81,8 @@ check "middleware.py tiene protect_internal_docs"
 # 6. Verificar dependencias
 echo ""
 echo "📦 Verificando dependencias..."
-grep -q "mkdocs" pyproject.toml
-check "mkdocs en pyproject.toml"
-
-grep -q "mkdocs-material" pyproject.toml
-check "mkdocs-material en pyproject.toml"
+grep -q "zensical" pyproject.toml
+check "zensical en pyproject.toml"
 
 # 7. Verificar enum DEVELOPER
 echo ""

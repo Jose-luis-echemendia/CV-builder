@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import HTTPException, Request, status
-from app.services.redis import RedisService
+from backend.app.core.redis import RedisService
 
 logger = logging.getLogger(__name__)
 

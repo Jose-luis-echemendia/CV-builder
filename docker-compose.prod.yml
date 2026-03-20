@@ -32,12 +32,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      prestart:
-        condition: service_completed_successfully
+      redis:
+        condition: service_started
     command: bash scripts/prestart.sh
     env_file:
       - .env
     environment:
+      - REDIS_HOST=redis
       - DOMAIN=${DOMAIN}
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - ENVIRONMENT=${ENVIRONMENT}
@@ -73,11 +74,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
       prestart:
         condition: service_completed_successfully
     env_file:
       - .env
     environment:
+      - REDIS_HOST=redis
       - DOMAIN=${DOMAIN}
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - ENVIRONMENT=${ENVIRONMENT}

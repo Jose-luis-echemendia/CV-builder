@@ -51,7 +51,7 @@ services:
   prestart:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     volumes:
       # Backend app files
       - ./backend/app:/app/app
@@ -70,10 +70,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     command: bash scripts/prestart.sh
     env_file:
       - .env
     environment:
+      - REDIS_HOST=redis
       - DOMAIN=${DOMAIN}
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - ENVIRONMENT=${ENVIRONMENT}
@@ -96,17 +99,20 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     depends_on:
       db:
         condition: service_healthy
       minio:
         condition: service_healthy
+      redis:
+        condition: service_started
       prestart:
         condition: service_completed_successfully
     env_file:
       - .env
     environment:
+      - REDIS_HOST=redis
       - DOMAIN=${DOMAIN}
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - ENVIRONMENT=${ENVIRONMENT}
@@ -159,7 +165,7 @@ services:
   celery_worker:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     command: bash scripts/start-celery-worker.sh
     volumes:
       - ./backend/app:/app/app
@@ -202,7 +208,7 @@ services:
   celery_beat:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     command: bash scripts/start-celery-beat.sh
     volumes:
       - ./backend/app:/app/app

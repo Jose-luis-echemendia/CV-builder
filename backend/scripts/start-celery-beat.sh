@@ -7,7 +7,7 @@ cd /app
 
 # Iniciar beat con logging
 celery -A app.core.celery beat \
-    --loglevel=info \
-    --pidfile=/tmp/celerybeat.pid \
-    --schedule=/tmp/celerybeat-schedule
+    --loglevel info \
+    --scheduler celery.beat.PersistentScheduler
+
 

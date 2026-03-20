@@ -19,7 +19,6 @@ router = APIRouter(prefix="/utils", tags=["utils"])
 # ===========================================================================
 
 
-
 # ===========================================================================
 #               --- Endpoint Health Check ---
 # ===========================================================================
@@ -113,8 +112,8 @@ async def get_example_with_dynamic_setting(
     Usamos el servicio para obtener un ajuste dinámico
     """
 
-    items_per_page = await settings_service.aget("ITEMS_PER_PAGE", default=25)
-    maintenance_mode = await settings_service.aget("MAINTENANCE_MODE", default=False)
+    items_per_page = await settings_service.get("ITEMS_PER_PAGE", default=25)
+    maintenance_mode = await settings_service.get("MAINTENANCE_MODE", default=False)
 
     if maintenance_mode:
         return {"message": "El sistema está en modo mantenimiento."}
@@ -135,7 +134,7 @@ async def clear_cache():
     Elimina todas las claves de Redis que empiezan con 'fastapi-cache:'
     (usadas por el decorador @cache) sin afectar otros datos en Redis.
     """
-    from app.services.redis import RedisService
+    from backend.app.core.redis import RedisService
 
     redis = RedisService.get_async()
     if not redis:

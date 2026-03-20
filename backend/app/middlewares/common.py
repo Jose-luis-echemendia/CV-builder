@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import Request
-from app.services import RedisService
+from app.core.redis import redis_client
 from app.utils import invalidate_cache_pattern
 
 # Configurar logger para este módulo
@@ -64,9 +64,8 @@ async def invalidate_cache_on_write_middleware(request: Request, call_next):
             # Invalidar todos los patrones encontrados
             if patterns_to_invalidate:
                 try:
-                    redis = await RedisService.get_redis()
                     for pattern in patterns_to_invalidate:
-                        await invalidate_cache_pattern(redis, pattern)
+                        await invalidate_cache_pattern(redis_client, pattern)
                 except Exception as e:
                     logger.error(
                         f"⚠️  Error al invalidar caché después de {request.method} {path}: {e}",

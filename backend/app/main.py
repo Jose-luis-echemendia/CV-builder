@@ -21,6 +21,7 @@ from app.core.config import settings
 from app.core.db import check_database, a_engine
 from app.core.logging import get_logger, setup_logging
 from app.core.s3 import minio_client
+from app.core.redis import setup_redis, teardown_redis, check_redis
 
 log = get_logger(__name__)
 
@@ -42,12 +43,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if not db_ok:
         raise RuntimeError("No se puede conectar a PostgreSQL. Abortando arranque.")
     log.info("app.db.ready")
+    
+    # 2. Redis 
+    await setup_redis()
+    log.info("app.redis.ready")
 
-    # 2. Caché Redis (fastapi-cache2 + CacheService)
+    # 3. Caché Redis (fastapi-cache2 + CacheService)
     await setup_cache()
     log.info("app.cache.ready")
 
-    # 3. MinIO — verificar conexión y crear buckets si no existen
+    # 4. MinIO — verificar conexión y crear buckets si no existen
     minio_ok = await minio_client.health_check()
     if not minio_ok:
         raise RuntimeError("No se puede conectar a MinIO. Abortando arranque.")
@@ -161,6 +166,7 @@ async def health() -> dict:
         "version":  settings.APP_VERSION,
         "services": {
             "database": await check_database(),
+            "redis":    await check_redis(),
             "cache":    await cache_service.ping(),
             "minio":    await minio_client.health_check(),
         },

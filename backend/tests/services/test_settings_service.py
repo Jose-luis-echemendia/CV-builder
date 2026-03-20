@@ -1,86 +1,75 @@
 import json
+import pytest
 from unittest.mock import Mock
 
 from app.services.settings import SettingsService, CACHE_KEY_PREFIX
 from app.models.app_setting import AppSetting
-from app.services.redis import RedisService
-
+from app.core import redis
 
 class DummyDBSession:
     def __init__(self, initial: dict[str, object] | None = None):
-        # store AppSetting-like objects by key
         self._store = {}
         if initial:
             for k, v in initial.items():
                 self._store[k] = AppSetting(key=k, value=v)
 
-    def get(self, model, key):
+    async def get(self, model, key):
         return self._store.get(key)
 
     def add(self, obj):
-        # simple store by key attribute
         self._store[obj.key] = obj
 
-    def commit(self):
+    async def commit(self):
         pass
 
-    def refresh(self, obj):
-        # noop for tests
+    async def refresh(self, obj):
         return obj
 
-
-class DummyRedis:
+class DummyRedisAsync:
     def __init__(self):
         self._store = {}
 
-    def get(self, key):
+    async def get(self, key):
         return self._store.get(key)
 
-    def set(self, key, value, ex=None):
+    async def set(self, key, value, ex=None):
         self._store[key] = value
 
-    def delete(self, *keys):
+    async def delete(self, *keys):
         for k in keys:
             self._store.pop(k, None)
 
-    def keys(self, pattern):
-        # naive implementation: ignore pattern
+    async def keys(self, pattern):
         return list(self._store.keys())
 
+@pytest.fixture
+def mock_redis(monkeypatch):
+    dummy_redis = DummyRedisAsync()
+    monkeypatch.setattr(redis, "redis_client", dummy_redis)
+    return dummy_redis
 
-def test_get_with_cache_hit(monkeypatch):
-    # Redis returns serialized JSON -> SettingsService.get should return decoded value
+@pytest.mark.asyncio
+async def test_get_with_cache_hit(mock_redis):
     db = DummyDBSession({"MY_KEY": {"a": 1}})
-    dummy_redis = DummyRedis()
-    dummy_redis.set(f"{CACHE_KEY_PREFIX}MY_KEY", json.dumps({"a": 1}))
-
-    monkeypatch.setattr(RedisService, "get_sync", classmethod(lambda cls: dummy_redis))
+    await mock_redis.set(f"{CACHE_KEY_PREFIX}MY_KEY", json.dumps({"a": 1}))
 
     svc = SettingsService(db)
-    val = svc.get("MY_KEY", default=None)
+    val = await svc.get("MY_KEY", default=None)
     assert val == {"a": 1}
 
-
-def test_get_cache_miss_reads_db_and_sets_cache(monkeypatch):
-    # Redis returns None, DB has setting, service should set redis.set
+@pytest.mark.asyncio
+async def test_get_cache_miss_reads_db_and_sets_cache(mock_redis):
     db = DummyDBSession({"MY_KEY2": "string-value"})
-    dummy_redis = DummyRedis()
-    monkeypatch.setattr(RedisService, "get_sync", classmethod(lambda cls: dummy_redis))
-
     svc = SettingsService(db)
-    val = svc.get("MY_KEY2", default=None)
+    val = await svc.get("MY_KEY2", default=None)
     assert val == "string-value"
-    # check cache set
-    assert dummy_redis.get(f"{CACHE_KEY_PREFIX}MY_KEY2") == json.dumps("string-value")
+    assert await mock_redis.get(f"{CACHE_KEY_PREFIX}MY_KEY2") == json.dumps("string-value")
 
-
-def test_update_creates_and_updates_cache(monkeypatch):
+@pytest.mark.asyncio
+async def test_update_creates_and_updates_cache(mock_redis):
     db = DummyDBSession()
-    dummy_redis = DummyRedis()
-    monkeypatch.setattr(RedisService, "get_sync", classmethod(lambda cls: dummy_redis))
-
     svc = SettingsService(db)
-    created = svc.update("NEW_KEY", {"x": True}, description="desc")
+    created = await svc.update("NEW_KEY", {"x": True}, description="desc")
     assert created.key == "NEW_KEY"
     assert created.value == {"x": True}
-    assert dummy_redis.get(f"{CACHE_KEY_PREFIX}NEW_KEY") == json.dumps({"x": True})
+    assert await mock_redis.get(f"{CACHE_KEY_PREFIX}NEW_KEY") == json.dumps({"x": True})

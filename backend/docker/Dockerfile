@@ -74,4 +74,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 EXPOSE 8000
 
-CMD ["fastapi", "run", "--workers", "4", "--host", "0.0.0.0", "app/main.py"]
+CMD ["uvicorn", "app.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--workers", "2", \
+     "--loop", "uvloop", \
+     "--http", "httptools", \
+     "--no-access-log"]

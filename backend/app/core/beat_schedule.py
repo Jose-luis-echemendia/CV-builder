@@ -9,36 +9,34 @@ Cada entrada define:
   options  — cola, expiración y prioridad
 
 Arrancar Beat (proceso separado del worker):
-  celery -A app.workers.celery_app.celery_app beat --loglevel info
+  celery -A app.celery_app.celery_app beat --loglevel info
 """
+
 from celery.schedules import crontab
 
 BEAT_SCHEDULE: dict = {
-
     # ── Limpieza de PDFs expirados ────────────────────────────────────────────
     # Borra de MinIO los PDFs cuyo presigned URL ya expiró y marca el CV
     # como DRAFT para que el usuario sepa que debe regenerarlo.
     # Se ejecuta cada hora.
     "cleanup-expired-pdfs": {
-        "task":     "app.workers.tasks.cleanup_tasks.cleanup_expired_pdfs",
-        "schedule": crontab(minute=0),               # cada hora en punto
-        "options":  {
-            "queue":   "maintenance",
-            "expires": 3300,                         # descarta si lleva > 55 min en cola
+        "task": "app.tasks.cleanup_tasks.cleanup_expired_pdfs",
+        "schedule": crontab(minute=0),  # cada hora en punto
+        "options": {
+            "queue": "maintenance",
+            "expires": 3300,  # descarta si lleva > 55 min en cola
         },
     },
-
     # ── Reset de CVs atascados en BUILDING ───────────────────────────────────
     # Si un worker murió a mitad de la generación, el CV queda en status
     # BUILDING para siempre. Esta tarea detecta CVs en BUILDING durante
     # más de 10 minutos y los marca como ERROR con mensaje explicativo.
     "cleanup-stale-building-cvs": {
-        "task":     "app.workers.tasks.cleanup_tasks.cleanup_stale_building_cvs",
-        "schedule": crontab(minute="*/10"),          # cada 10 minutos
-        "options":  {
-            "queue":   "maintenance",
-            "expires": 540,                          # descarta si lleva > 9 min en cola
+        "task": "app.tasks.cleanup_tasks.cleanup_stale_building_cvs",
+        "schedule": crontab(minute="*/10"),  # cada 10 minutos
+        "options": {
+            "queue": "maintenance",
+            "expires": 540,  # descarta si lleva > 9 min en cola
         },
     },
-
 }
