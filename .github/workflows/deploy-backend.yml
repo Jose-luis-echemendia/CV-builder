@@ -43,7 +43,7 @@ jobs:
           envs: SECRET_KEY ,SENTRY_DSN ,POSTGRES_PASSWORD ,MINIO_ACCESS_KEY ,MINIO_SECRET_KEY ,REDIS_PASSWORD ,SMTP_USER ,SMTP_PASSWORD
           script: |
             set -e
-            cd /services-config/projects/cv-builder-FastAPI
+            cd /services-config/projects/CV-builder
             git fetch origin main
             git reset --hard origin/main
 
