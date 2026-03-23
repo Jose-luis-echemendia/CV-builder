@@ -44,10 +44,15 @@ jobs:
           script: |
             set -e
             cd /services-config/projects/CV-builder
+            
             git fetch origin main
             git reset --hard origin/main
-
+            
             git checkout prod
+
+            git fetch origin prod
+            git reset --hard origin/prod
+            
 
             # 1. Inyectar y aplicar Secretos + Config
             export SECRET_KEY=${{ secrets.SECRET_KEY }}
