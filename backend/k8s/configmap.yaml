@@ -36,7 +36,7 @@ data:
   DB_ECHO: "False"
 
   # --- S3/MinIO Settings ---
-  MINIO_ENDPOINT: "http://minio-service:9099"
+  MINIO_ENDPOINT: "minio-service:9099"
   MINIO_BUCKET_CVS: "cv-storage"
   MINIO_BUCKET_ASSETS: "cv-assets"
   MINIO_PUBLIC_DOMAIN: "https://minio.api.netsy.ai"
