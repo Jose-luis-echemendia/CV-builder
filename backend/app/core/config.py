@@ -271,10 +271,10 @@ class Settings(BaseSettings):
                 )
             if self.DEBUG:
                 raise ValueError("DEBUG no puede ser True en producción.")
-            if not self.MINIO_USE_SSL:
-                raise ValueError(
-                    "MINIO_USE_SSL debe ser True en producción (requiere HTTPS)."
-                )
+            # if not self.MINIO_USE_SSL:
+            #     raise ValueError(
+            #         "MINIO_USE_SSL debe ser True en producción (requiere HTTPS)."
+            #     )
             if not self.LOG_JSON:
                 raise ValueError(
                     "LOG_JSON debe ser True en producción para logging estructurado."

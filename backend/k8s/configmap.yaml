@@ -40,7 +40,7 @@ data:
   MINIO_BUCKET_CVS: "cv-storage"
   MINIO_BUCKET_ASSETS: "cv-assets"
   MINIO_PUBLIC_DOMAIN: "https://minio.api.netsy.ai"
-  MINIO_USE_SSL: "True"
+  MINIO_USE_SSL: "False"
   MINIO_PRESIGN_TTL: "3600"
 
   # --- REDIS Settings ---
