@@ -1,9 +1,18 @@
 name: Backend CI/CD
 
 on:
-    push:
-        branches: ["main"]
-    workflow_dispatch:
+  push:
+    branches:
+      - prod
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  pull_request:
+    branches:
+      - prod
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
 
 jobs:
     build-and-deploy:
