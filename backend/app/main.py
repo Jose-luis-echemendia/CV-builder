@@ -92,11 +92,11 @@ app = FastAPI(
 # ========================================================================
 #              --- Servir documentación interna ---
 # ========================================================================
-app.mount(
-    "/internal-docs",
-    StaticFiles(directory="internal_docs/site", html=True),
-    name="internal-docs",
-)
+# app.mount(
+#     "/internal-docs",
+#     StaticFiles(directory="internal_docs/site", html=True),
+#     name="internal-docs",
+# )
 
 # ========================================================================
 #              --- CONFIGURACIÓN DE MIDDLEWARES ---
