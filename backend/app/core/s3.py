@@ -17,6 +17,7 @@ Uso en servicios:
     presigned = await minio_client.get_download_url(cv_id)
     await minio_client.delete_pdf(cv_id)
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -38,6 +39,7 @@ log = get_logger(__name__)
 # Helpers internos
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _cv_object_name(cv_id: str | UUID) -> str:
     """Nombre del objeto PDF en MinIO. Ej: 'pdfs/abc123.pdf'"""
     return f"pdfs/{cv_id}.pdf"
@@ -57,6 +59,7 @@ def _template_preview_name(template_slug: str) -> str:
 # MinIOClient
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class MinIOClient:
     """
     Wrapper sobre el cliente oficial de MinIO.
@@ -71,9 +74,9 @@ class MinIOClient:
             endpoint=settings.MINIO_ENDPOINT,
             access_key=settings.MINIO_ACCESS_KEY,
             secret_key=settings.MINIO_SECRET_KEY.get_secret_value(),
-            secure=settings.MINIO_SECURE,
+            secure=settings.MINIO_USE_SSL,
         )
-        self._bucket_cvs    = settings.MINIO_BUCKET_CVS
+        self._bucket_cvs = settings.MINIO_BUCKET_CVS
         self._bucket_assets = settings.MINIO_BUCKET_ASSETS
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -115,8 +118,8 @@ class MinIOClient:
             Nombre del objeto en MinIO (no la URL — usa get_download_url para eso).
         """
         object_name = _cv_object_name(cv_id)
-        data        = io.BytesIO(pdf_bytes)
-        size        = len(pdf_bytes)
+        data = io.BytesIO(pdf_bytes)
+        size = len(pdf_bytes)
 
         await asyncio.to_thread(
             self._client.put_object,
@@ -126,7 +129,7 @@ class MinIOClient:
             size,
             content_type="application/pdf",
             metadata={
-                "cv-id":    str(cv_id),
+                "cv-id": str(cv_id),
                 "generator": settings.APP_NAME,
             },
         )
@@ -151,7 +154,9 @@ class MinIOClient:
                 ),
             },
         )
-        log.debug("minio.pdf.presigned", cv_id=str(cv_id), ttl=settings.MINIO_PRESIGN_TTL)
+        log.debug(
+            "minio.pdf.presigned", cv_id=str(cv_id), ttl=settings.MINIO_PRESIGN_TTL
+        )
         return url
 
     async def delete_pdf(self, cv_id: str | UUID) -> None:
@@ -202,7 +207,7 @@ class MinIOClient:
             URL pública del avatar (los assets son públicos por política del bucket).
         """
         object_name = _avatar_object_name(user_id)
-        data        = io.BytesIO(image_bytes)
+        data = io.BytesIO(image_bytes)
 
         await asyncio.to_thread(
             self._client.put_object,
@@ -249,7 +254,7 @@ class MinIOClient:
             URL pública del preview.
         """
         object_name = _template_preview_name(template_slug)
-        data        = io.BytesIO(image_bytes)
+        data = io.BytesIO(image_bytes)
 
         await asyncio.to_thread(
             self._client.put_object,
@@ -273,7 +278,7 @@ class MinIOClient:
         Construye la URL pública de un objeto en un bucket sin acceso restringido.
         Para assets (avatares, previews) que son de lectura pública.
         """
-        scheme = "https" if settings.MINIO_SECURE else "http"
+        scheme = "https" if settings.MINIO_USE_SSL else "http"
         return f"{scheme}://{settings.MINIO_ENDPOINT}/{bucket}/{object_name}"
 
     async def health_check(self) -> bool:

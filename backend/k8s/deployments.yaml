@@ -1,0 +1,78 @@
+# BACKEND
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-backend
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cv-backend
+  template:
+    metadata:
+      labels:
+        app: cv-backend
+    spec:
+      containers:
+        - name: backend
+          image: jose031003/fastapi-cv-builder:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef: { name: cv-config }
+            - secretRef: { name: cv-secrets }
+---
+# WORKER
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-worker
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cv-worker
+  template:
+    metadata:
+      labels:
+        app: cv-worker
+    spec:
+      containers:
+        - name: worker
+          image: jose031003/fastapi-cv-builder:latest
+          imagePullPolicy: Always
+          command: ["bash", "scripts/start-celery-worker.sh"]
+          envFrom:
+            - configMapRef: { name: cv-config }
+            - secretRef: { name: cv-secrets }
+---
+# BEAT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-beat
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cv-beat
+  template:
+    metadata:
+      labels:
+        app: cv-beat
+    spec:
+      containers:
+        - name: beat
+          image: jose031003/fastapi-cv-builder:latest
+          imagePullPolicy: Always
+          command: ["bash", "scripts/start-celery-beat.sh"]
+          envFrom:
+            - configMapRef: { name: cv-config }
+            - secretRef: { name: cv-secrets }

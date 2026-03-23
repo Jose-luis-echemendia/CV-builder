@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cv-config
+data:
+  # --─ APLICACIÓN ---
+  APP_NAME: "CV Generator API"
+  ENVIRONMENT: "production"
+  APP_VERSION: "0.1.0"
+  API_V1_PREFIX: "/api/v1"
+  DOMAIN: "https://cv.api.netsy.ai"
+  FRONTEND_HOST: "https://cv-builder-va47.vercel.app"
+
+  DEBUG: "False"
+  LOG_LEVEL: "INFO"
+  LOG_JSON: "True"
+
+  # --─ CORS ---
+  BACKEND_CORS_ORIGINS: "http://localhos:3000,http://localhost:5173,https://gateway.api.netsy.ai,https://cv-builder-va47.vercel.app"
+  CORS_ALLOW_LOCALHOST: "True"
+
+  # --- Sentry Settings ---
+  SENTRY_ENVIRONMENT: "production"
+
+  # --- DB Settings ---
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "cv"
+  POSTGRES_USER: "postgres"
+
+  # Pool de conexiones SQLAlchemy
+  DB_POOL_SIZE: "10"
+  DB_MAX_OVERFLOW: "20"
+  DB_POOL_TIMEOUT: "30"
+  DB_POOL_RECYCLE: "1800"
+  DB_ECHO: "False"
+
+  # --- S3/MinIO Settings ---
+  MINIO_ENDPOINT: "http://minio-service:9099"
+  MINIO_BUCKET_CVS: "cv-storage"
+  MINIO_BUCKET_ASSETS: "cv-assets"
+  MINIO_PUBLIC_DOMAIN: "https://minio.api.netsy.ai"
+  MINIO_USE_SSL: "True"
+  MINIO_PRESIGN_TTL: "3600"
+
+  # --- REDIS Settings ---
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB_BROKER: "0"
+  REDIS_DB_BACKEND: "1"
+  REDIS_DB_CACHE: "2"
+
+  # TTL de cache
+  CACHE_TTL_SHORT: "60"
+  CACHE_TTL_DEFAULT: "300"
+  CACHE_TTL_LONG: "3600"
+
+  # --- Celery ---
+  CELERY_TASK_TIME_LIMIT: "180" # 1 hora máx por tarea
+  CELERY_TASK_SOFT_TIME_LIMIT: "120" # Soft limit para cleanup
+  CELERY_MAX_RETRIES: "3"
+  CELERY_RETRY_BACKOFF: "60"
+
+  PDF_DPI: "150"
+  PDF_EXPIRY_HOURS: "24"
+
+  # SMTP Configuration for sending emails (e.g., password resets)
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "587"
+  SMTP_TLS: "True"
+  EMAILS_FROM_EMAIL: "echemendiajoseluis@gmail.com"
+  EMAILS_FROM_NAME: "Netsy Support"

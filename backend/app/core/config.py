@@ -161,7 +161,7 @@ class Settings(BaseSettings):
     )
     MINIO_ACCESS_KEY: str = Field(..., description="Access key de MinIO")
     MINIO_SECRET_KEY: SecretStr = Field(..., description="Secret key de MinIO")
-    MINIO_SECURE: bool = False  # True = HTTPS en producción
+    MINIO_USE_SSL: bool = False  # True = HTTPS en producción
 
     MINIO_BUCKET_CVS: str = "cvs"  # PDFs generados
     MINIO_BUCKET_ASSETS: str = "cv-assets"  # Avatares, previews de plantillas
@@ -271,9 +271,9 @@ class Settings(BaseSettings):
                 )
             if self.DEBUG:
                 raise ValueError("DEBUG no puede ser True en producción.")
-            if not self.MINIO_SECURE:
+            if not self.MINIO_USE_SSL:
                 raise ValueError(
-                    "MINIO_SECURE debe ser True en producción (requiere HTTPS)."
+                    "MINIO_USE_SSL debe ser True en producción (requiere HTTPS)."
                 )
             if not self.LOG_JSON:
                 raise ValueError(
@@ -310,7 +310,11 @@ class Settings(BaseSettings):
             "minioadminsecret",
         }
 
-        if isinstance(normalized, str) and normalized.lower() in insecure_defaults and not self.is_development:
+        if (
+            isinstance(normalized, str)
+            and normalized.lower() in insecure_defaults
+            and not self.is_development
+        ):
             raise ValueError(
                 f"{var_name} no puede usar un valor por defecto/inseguro. "
                 "Debes cambiarlo en las variables de entorno."

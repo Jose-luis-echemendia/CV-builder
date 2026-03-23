@@ -1,0 +1,38 @@
+# EL SERVICIO (Intercomunicador interno)
+apiVersion: v1
+kind: Service
+metadata:
+  name: cv-service
+spec:
+  selector:
+    app: cv-backend # Debe coincidir con el label de tu deployment
+  ports:
+    - protocol: TCP
+      port: 80 # Puerto por el que escucha el servicio
+      targetPort: 8000 # Puerto donde corre tu FastAPI dentro del contenedor
+---
+# EL INGRESS (Puerta principal a Internet)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cv-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - cv.api.netsy.ai
+      secretName: cv-tls-cert
+  rules:
+    - host: cv.api.netsy.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cv-service # Apunta al servicio de arriba
+                port:
+                  number: 80

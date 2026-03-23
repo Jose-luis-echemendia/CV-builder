@@ -171,14 +171,14 @@ async def system_status() -> SystemStatusResponse:
         t0 = time.monotonic()
         s3 = boto3.client(
             "s3",
-            endpoint_url=settings.S3_ENDPOINT,
-            aws_access_key_id=settings.S3_ACCESS_KEY,
-            aws_secret_access_key=settings.S3_SECRET_KEY,
-            use_ssl=settings.S3_USE_SSL,
+            endpoint_url=settings.MINIO_ENDPOINT,
+            aws_access_key_id=settings.MINIO_ACCESS_KEY,
+            aws_secret_access_key=settings.MINIO_SECRET_KEY,
+            use_ssl=settings.MINIO_USE_SSL,
             region_name="us-east-1",  # MinIO usually ignores this, but boto3 may complain if empty
         )
         # Verificamos si el bucket existe y tenemos acceso
-        s3.head_bucket(Bucket=settings.S3_BUCKET_NAME)
+        s3.head_bucket(Bucket=settings.MINIO_BUCKET_NAME)
         latency = round((time.monotonic() - t0) * 1000, 1)
         services.append(
             ServiceStatus(

@@ -1,0 +1,67 @@
+name: CI/CD Smart Web Scraping Stack
+
+on:
+    push:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Login Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build & Push
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: jose031003/fastapi-cv-builder:latest,jose031003/fastapi-cv-builder:${{ github.sha }}
+
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.VPS_IP }}
+                  username: ${{ secrets.VPS_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  envs: SECRET_KEY ,SENTRY_DSN ,POSTGRES_PASSWORD ,MINIO_ACCESS_KEY ,MINIO_SECRET_KEY ,REDIS_PASSWORD ,SMTP_USER ,SMTP_PASSWORD
+                  script: |
+                      set -e
+                      cd /services-config/projects/cv-builder-FastAPI
+                      git fetch origin main
+                      git reset --hard origin/main
+
+                      # 1. Inyectar y aplicar Secretos + Config
+                      export SECRET_KEY=${{ secrets.SECRET_KEY }}
+                      export SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+                      export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+                      export MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}
+                      export MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}
+                      export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+                      export SMTP_USER=${{ secrets.SMTP_USER }}
+                      export SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}"
+
+                      envsubst < k8s/secrets.yaml | kubectl apply -f -
+                      kubectl apply -f k8s/configmap.yaml
+
+                      # 2. Ejecutar Migraciones (Borrar job viejo y lanzar nuevo con la imagen del SHA)
+                      kubectl delete job cv-prestart --ignore-not-found
+                      envsubst < k8s/prestart-job.yaml | kubectl apply -f -
+
+                      # 3. Aplicar infraestructura de Deployments
+                      kubectl apply -f k8s/deployments.yaml
+                      kubectl apply -f k8s/services-ingress.yaml # No olvides incluir Service e Ingress aquí
+
+                      # 4. Actualizar las 3 piezas al nuevo SHA
+                      kubectl set image deployment/cv-backend backend=jose031003/fastapi-cv-builder:${{ github.sha }}
+                      kubectl set image deployment/cv-worker worker=jose031003/fastapi-cv-builder:${{ github.sha }}
+                      kubectl set image deployment/cv-beat beat=jose031003/fastapi-cv-builder:${{ github.sha }}
+
+                      # 5. Verificar salud
+                      kubectl rollout status deployment/cv-backend
