@@ -59,16 +59,16 @@ jobs:
             export SMTP_USER=${{ secrets.SMTP_USER }}
             export SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}"
 
-            envsubst < k8s/secrets.yaml | kubectl apply -f -
-            kubectl apply -f k8s/configmap.yaml
+            envsubst < backend/k8s/secrets.yaml | kubectl apply -f -
+            kubectl apply -f backend/k8s/configmap.yaml
 
             # 2. Ejecutar Migraciones (Borrar job viejo y lanzar nuevo con la imagen del SHA)
             kubectl delete job cv-prestart --ignore-not-found
-            envsubst < k8s/prestart-job.yaml | kubectl apply -f -
+            envsubst < backend/k8s/prestart-job.yaml | kubectl apply -f -
 
             # 3. Aplicar infraestructura de Deployments
-            kubectl apply -f k8s/deployments.yaml
-            kubectl apply -f k8s/services-ingress.yaml # No olvides incluir Service e Ingress aquí
+            kubectl apply -f backend/k8s/deployments.yaml
+            kubectl apply -f backend/k8s/services-ingress.yaml # No olvides incluir Service e Ingress aquí
 
             # 4. Actualizar las 3 piezas al nuevo SHA
             kubectl set image deployment/cv-backend backend=jose031003/fastapi-cv-builder:${{ github.sha }}
