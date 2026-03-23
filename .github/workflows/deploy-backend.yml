@@ -47,6 +47,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            git checkout prod
+
             # 1. Inyectar y aplicar Secretos + Config
             export SECRET_KEY=${{ secrets.SECRET_KEY }}
             export SENTRY_DSN=${{ secrets.SENTRY_DSN }}
